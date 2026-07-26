@@ -14,6 +14,7 @@ $mdDir    = Join-Path $siteRoot "d/$Date"
 $mdPath   = Join-Path $mdDir "digest.md"
 $htmlPath = Join-Path $mdDir "index.html"
 $vcjs     = "C:\Users\rafae\AppData\Roaming\npm\node_modules\vercel\dist\vc.js"
+$nodeBin  = (Get-Command node.exe).Source
 
 if (-not (Test-Path $mdPath)) {
     Write-Error "missing source: $mdPath"
@@ -22,12 +23,14 @@ if (-not (Test-Path $mdPath)) {
 
 # 1) Render HTML.
 Write-Host "[publish_site] rendering $mdPath -> $htmlPath"
+& $nodeBin $vcjs $null
+& $nodeBin $null  # placeholder
 & python (Join-Path $siteRoot "scripts/render_html.py") $mdPath $htmlPath
 if ($LASTEXITCODE -ne 0) { throw "render_html.py failed (exit $LASTEXITCODE)" }
 
 # 2) Regenerate archive.json + today.html.
 Write-Host "[publish_site] rebuilding archive.json + today.html"
-& node (Join-Path $siteRoot "scripts/rebuild_archive.js")
+& $nodeBin (Join-Path $siteRoot "scripts/rebuild_archive.js")
 if ($LASTEXITCODE -ne 0) { throw "rebuild_archive.js failed (exit $LASTEXITCODE)" }
 
 # 3) Git commit (no push — Vercel deploys from local state).
@@ -47,18 +50,14 @@ try {
     Pop-Location
 }
 
-# 4) Vercel deploy (production). The URL Vercel assigns to the new deploy
-#    is captured below so the cron agent can post it to the Telegram topic.
+# 4) Vercel deploy (production) via explicit node + vc.js call to avoid
+#    PowerShell argument mangling.
 Write-Host "[publish_site] deploying to Vercel production"
-$deployOutput = & node $vcjs deploy --prod --yes --scope leafargs-projects --no-color 2>&1 | Out-String
+$deployOutput = & $nodeBin $vcjs deploy --prod --yes --scope leafargs-projects 2>&1 | Out-String
 Write-Host $deployOutput
 
-# Parse the deploy URL from the output. Vercel prints:
-#   "▲ Production  https://ai-digest-site-XXXX-leafargs-projects.vercel.app"
-#   or
-#   "Aliased       https://ai-digest-site-pink.vercel.app"
-#   "Inspect       https://vercel.com/..."
-# Prefer the canonical alias line if present; fall back to the Production URL.
+# 5) Parse the deploy URL. Prefer "Aliased" line, fall back to "Production"
+#    line, then any *.vercel.app URL.
 $deployUrl = $null
 foreach ($line in ($deployOutput -split "`r?`n")) {
     if ($line -match '^\s*Aliased\s+(https?://\S+)') {
@@ -87,8 +86,11 @@ if (-not $deployUrl) {
     throw "could not parse Vercel deploy URL from output"
 }
 
-$digestUrl = $deployUrl.TrimEnd('/') + "d/$Date/"
+$digestUrl = $deployUrl.TrimEnd('/') + "/d/$Date/"
 $lastUrlFile = Join-Path $siteRoot ".last-deploy-url"
-"deploy=$deployUrl`r`ndigest=$digestUrl" | Out-File -Encoding utf8 $lastUrlFile
+$payload = "deploy=$deployUrl`r`ndigest=$digestUrl`r`ndate=$Date`r`n"
+[System.IO.File]::WriteAllText($lastUrlFile, $payload, [System.Text.UTF8Encoding]::new($false))
 
-Write-Host "[publish_site] OK deploy=$deployUrl digest=$digestUrl"
+Write-Host "[publish_site] OK"
+Write-Host "  deploy = $deployUrl"
+Write-Host "  digest = $digestUrl"
