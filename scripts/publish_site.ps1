@@ -48,10 +48,11 @@ try {
     Pop-Location
 }
 
-# 4) Vercel deploy (production) via explicit node + vc.js call to avoid
-#    PowerShell argument mangling.
+# 4) Vercel deploy (production) — invoke via cmd /c to bypass PowerShell's
+#    error-stream handling on the Vercel CLI's stderr writes.
 Write-Host "[publish_site] deploying to Vercel production"
-$deployOutput = & $nodeBin $vcjs deploy --prod --yes --scope leafargs-projects 2>&1 | Out-String
+$deployOutput = cmd /c "`"$nodeBin`" `"$vcjs`" deploy --prod --yes --scope leafargs-projects" 2>&1
+$deployOutput = ($deployOutput | Out-String).Trim()
 Write-Host $deployOutput
 
 # 5) Parse the deploy URL. Prefer "Aliased" line, fall back to "Production"
