@@ -23,8 +23,6 @@ if (-not (Test-Path $mdPath)) {
 
 # 1) Render HTML.
 Write-Host "[publish_site] rendering $mdPath -> $htmlPath"
-& $nodeBin $vcjs $null
-& $nodeBin $null  # placeholder
 & python (Join-Path $siteRoot "scripts/render_html.py") $mdPath $htmlPath
 if ($LASTEXITCODE -ne 0) { throw "render_html.py failed (exit $LASTEXITCODE)" }
 
