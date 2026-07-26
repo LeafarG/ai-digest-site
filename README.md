@@ -28,3 +28,6 @@ Open `index.html` in a browser. No build step.
 `git push origin main` triggers a Vercel auto-deploy via the GitHub App.
 
 Production URL: `https://ai-digest-site.vercel.app/`
+
+
+Last auto-deploy-tested 2026-07-26 from cron-flow.
