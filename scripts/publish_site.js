@@ -48,31 +48,34 @@ function run(label, cmd, args, opts = {}) {
   return r;
 }
 
-function extractDeployUrl(output) {
-  const lines = String(output || "").split(/\r?\n/);
-  let url = null;
-  for (const line of lines) {
-    const m = line.match(/^\s*Aliased\s+(https?:\/\/\S+)/);
-    if (m) { url = m[1].trim(); break; }
-  }
-  if (!url) {
-    for (const line of lines) {
-      const m = line.match(/Production\s+(https?:\/\/\S+)/);
-      if (m) { url = m[1].trim(); break; }
+function stripAnsi(s) {
+  // Remove ANSI escape sequences (Vercel CLI uses [\u001b[2K[\u001b[1A ...]).
+  return String(s || "").replace(/\u001b\[[0-9;]*[A-Za-z]/g, "");
+}
+
+function extractDeployInfo(output) {
+  const raw = stripAnsi(output);
+  const lines = raw.split(/\r?\n/);
+  let aliased = null;
+  let production = null;
+  let perDeploy = null;
+  for (const rawLine of lines) {
+    const line = stripAnsi(rawLine);
+    let m;
+    if ((m = line.match(/Aliased\s+(https?:\/\/\S+)/))) aliased = m[1].trim();
+    else if ((m = line.match(/Production\s+(https?:\/\/\S+)/))) production = m[1].trim();
+    else if ((m = line.match(/(https?:\/\/ai-digest-site-[a-z0-9]+\.vercel\.app\/?)/))) {
+      perDeploy = m[1].trim();
+      if (!perDeploy.endsWith("/")) perDeploy += "/";
     }
   }
-  if (!url) {
-    for (const line of lines) {
-      const m = line.match(/(https?:\/\/ai-digest-site[a-z0-9-]*\.vercel\.app\/?)/);
-      if (m) {
-        url = m[1].trim();
-        if (!url.endsWith("/")) url += "/";
-        break;
-      }
-    }
+  if (!aliased && !production && !perDeploy) {
+    throw new Error("could not parse any Vercel URL from output");
   }
-  if (!url) throw new Error("could not parse Vercel deploy URL from output");
-  return url;
+  // Prefer the stable production alias (e.g. -pink.vercel.app), then the
+  // per-deploy URL, then fall back to whatever we have.
+  const canonical = (aliased || production || perDeploy).replace(/\/$/, "");
+  return { aliased, production, perDeploy, canonical };
 }
 
 (async function main() {
@@ -115,15 +118,24 @@ function extractDeployUrl(output) {
     console.error("[publish_site] vercel exited with status " + d.status + " (attempting to parse output)");
   }
 
-  // 5) Parse the deploy URL and emit the digest URL.
-  const deployUrl = extractDeployUrl(allOut).replace(/\/$/, "");
-  const digestUrl = deployUrl + "/d/" + DATE + "/";
+  // 5) Parse the deploy URL(s) and emit a digest URL on the canonical alias.
+  const info = extractDeployInfo(allOut);
+  const canonical = info.canonical;
+  const digestUrl = canonical + "/d/" + DATE + "/";
   const lastUrlFile = path.join(SITE_ROOT, ".last-deploy-url");
-  const payload = "deploy=" + deployUrl + "\r\ndigest=" + digestUrl + "\r\ndate=" + DATE + "\r\n";
-  fs.writeFileSync(lastUrlFile, payload, "utf8");
+  const lines = [
+    "deploy=" + canonical,
+    "digest=" + digestUrl,
+    "date=" + DATE,
+  ];
+  if (info.perDeploy) lines.push("per_deploy=" + info.perDeploy);
+  if (info.aliased) lines.push("alias=" + info.aliased);
+  fs.writeFileSync(lastUrlFile, lines.join("\r\n") + "\r\n", "utf8");
   console.log("[publish_site] OK");
-  console.log("  deploy = " + deployUrl);
-  console.log("  digest = " + digestUrl);
+  console.log("  canonical = " + canonical);
+  console.log("  digest    = " + digestUrl);
+  if (info.perDeploy) console.log("  per_deploy= " + info.perDeploy);
+  if (info.aliased) console.log("  alias     = " + info.aliased);
 })().catch((e) => {
   console.error("[publish_site] FAILED: " + (e && e.message ? e.message : e));
   process.exit(1);
