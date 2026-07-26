@@ -14,16 +14,16 @@
     "date": "2026-07-26",
     "title": "AI Digest — 2026-07-26",
     "n_stories": 8,
-    "first_kicker": "[POLICY]",
+    "first_kicker": "[MODEL]",
     "queries": [
+      "\"Claude Opus 5 launch\"",
+      "\"OpenAI sandbox escape Hugging Face\"",
       "\"AMD Anthropic $5B\"",
-      "\"DeepSeek fundraise pause\"",
-      "\"Open Weights letter\"",
-      "\"Claude Opus 5 prompt injection\"",
-      "\"28.9M microcontroller\"",
-      "\"Debian LLM GR\"",
-      "\"Grok Workspace add-on\"",
-      "\"Meta Muse Spark 1.1 agents\"."
+      "\"open weights letter\"",
+      "\"Moonshot Kimi K3 open weights\"",
+      "\"Microsoft MAI models cost\"",
+      "\"NVIDIA SK Group $500B\"",
+      "\"EU AI Act August 2 deadline\"."
     ],
     "description": "",
     "url": "/d/2026-07-26/"
