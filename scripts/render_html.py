@@ -170,7 +170,7 @@ def main() -> int:
             file=sys.stderr,
         )
         return 3
-    if "\xe2\x80\x94".encode("utf-8") not in raw:
+    if "\u2014".encode("utf-8") not in raw:
         print("Self-check WARNING: file contains no em-dash bytes (U+2014).", file=sys.stderr)
     print(f"rendered {args.output_html}: title={title!r} stories={meta['n_stories']}")
     return 0
