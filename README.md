@@ -31,3 +31,6 @@ Production URL: `https://ai-digest-site.vercel.app/`
 
 
 Last auto-deploy-tested 2026-07-26 from cron-flow.
+
+
+Rotation test marker 1045.
