@@ -1,0 +1,337 @@
+[
+  {
+    "date": "2026-07-26",
+    "title": "AI Digest — 2026-07-26",
+    "n_stories": 8,
+    "first_kicker": "[POLICY]",
+    "queries": [
+      "\"AMD Anthropic $5B\"",
+      "\"DeepSeek fundraise pause\"",
+      "\"Open Weights letter\"",
+      "\"Claude Opus 5 prompt injection\"",
+      "\"28.9M microcontroller\"",
+      "\"Debian LLM GR\"",
+      "\"Grok Workspace add-on\"",
+      "\"Meta Muse Spark 1.1 agents\"."
+    ],
+    "description": "",
+    "url": "/d/2026-07-26/"
+  },
+  {
+    "date": "2026-07-25",
+    "title": "AI Digest — 2026-07-25",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "Claude Opus 5",
+      "FLUX 3",
+      "AMD Anthropic",
+      "Hugging Face breach",
+      "OpenAI Presence",
+      "EU AI Act fine",
+      "DOE Arcee",
+      "ChatGPT Health."
+    ],
+    "description": "",
+    "url": "/d/2026-07-25/"
+  },
+  {
+    "date": "2026-07-24",
+    "title": "AI Digest — 2026-07-24",
+    "n_stories": 8,
+    "first_kicker": "[FUNDING]",
+    "queries": [
+      "\"AI news July 23 2026\"",
+      "\"AMD Anthropic $5B infrastructure deal\"",
+      "\"White House 30-day AI review framework\"",
+      "\"Kimi K3 wipes OpenAI Anthropic valuation\"",
+      "\"Anthropic Managed Agents Claude Developer Platform\"",
+      "\"DeepSeek API alias deadline July 24\"."
+    ],
+    "description": "",
+    "url": "/d/2026-07-24/"
+  },
+  {
+    "date": "2026-07-23",
+    "title": "AI Digest — 2026-07-23",
+    "n_stories": 8,
+    "first_kicker": "[FUNDING]",
+    "queries": [
+      "\"AI news latest model release July 22 2026\"",
+      "\"OpenAI Anthropic Google DeepMind announcement July 2026\"",
+      "\"AI research breakthrough arXiv paper July 22 2026\"",
+      "\"AI funding round acquisition July 2026\"."
+    ],
+    "description": "",
+    "url": "/d/2026-07-23/"
+  },
+  {
+    "date": "2026-07-22",
+    "title": "AI Digest — 2026-07-22",
+    "n_stories": 8,
+    "first_kicker": "[SECURITY]",
+    "queries": [
+      "OpenAI-HuggingFace security",
+      "Gemini 3.6 Flash launch",
+      "Claude Cowork Record a Skill",
+      "OpenAI small business program",
+      "EU AI Act high-risk guidelines",
+      "AI funding tracker July 21",
+      "Hugging Face trending papers."
+    ],
+    "description": "",
+    "url": "/d/2026-07-22/"
+  },
+  {
+    "date": "2026-07-21",
+    "title": "AI Digest — 2026-07-21",
+    "n_stories": 9,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "NVIDIA SIGGRAPH 2026",
+      "Sakana Fugu-Cyber",
+      "Anthropic settlement",
+      "EU AI Act Digital Omnibus",
+      "Kimi K3 open weights",
+      "42 state AGs OpenAI."
+    ],
+    "description": "",
+    "url": "/d/2026-07-21/"
+  },
+  {
+    "date": "2026-07-20",
+    "title": "AI Digest — 2026-07-20",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "Kimi K3 GPU pause",
+      "Qwen3.8-Max",
+      "SpaceX AI compute rental",
+      "Meshy Series B",
+      "WAICO Shanghai",
+      "Willison Bun Rust port",
+      "Hallmark anti-slop",
+      "AGIBOT WAIC."
+    ],
+    "description": "",
+    "url": "/d/2026-07-20/"
+  },
+  {
+    "date": "2026-07-19",
+    "title": "AI Digest — 2026-07-19",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "Oracle layoffs Stargate",
+      "Microsoft Project Perception Mythos",
+      "Thinking Machines Inkling 975B",
+      "OpenAI ChatGPT desktop",
+      "GitHub Copilot repository metrics",
+      "EU AI Act Article 50",
+      "Anthropic Fable 5 deadline",
+      "AI news July 18 2026."
+    ],
+    "description": "",
+    "url": "/d/2026-07-19/"
+  },
+  {
+    "date": "2026-07-18",
+    "title": "AI Digest — 2026-07-18",
+    "n_stories": 8,
+    "first_kicker": "[TOOLING]",
+    "queries": [
+      "model release July 17",
+      "Meta AWS hire",
+      "Microsoft Project Perception",
+      "Kimi K3 benchmarks",
+      "Anthropic state AI law",
+      "Apple Baltra chip",
+      "Monumental Series B",
+      "AI security vulnerability."
+    ],
+    "description": "",
+    "url": "/d/2026-07-18/"
+  },
+  {
+    "date": "2026-07-17",
+    "title": "AI Digest — 2026-07-17",
+    "n_stories": 9,
+    "first_kicker": "[POLICY]",
+    "queries": [
+      "WAICO Shanghai",
+      "Kimi K3",
+      "Hugging Face breach July 2026",
+      "Databricks Coatue 188B",
+      "TSMC Arizona 100B",
+      "VideoChat3",
+      "Ring-Zero 1T RL",
+      "Microsoft AI security tool",
+      "Gemini Notebook rebrand."
+    ],
+    "description": "",
+    "url": "/d/2026-07-17/"
+  },
+  {
+    "date": "2026-07-16",
+    "title": "AI Digest — 2026-07-16",
+    "n_stories": 8,
+    "first_kicker": "[SECURITY]",
+    "queries": [
+      "q1=AI news July 15 2026",
+      "q2=Anthropic Blackstone Ode JV",
+      "q3=xAI Grok Build breach",
+      "q4=Helsing Series E",
+      "q5=OpenAI smart speaker Bloomberg",
+      "q6=Anthropic TCS partnership",
+      "q7=EU AI Act readiness tracker",
+      "q8=arXiv breakthrough backdoors."
+    ],
+    "description": "",
+    "url": "/d/2026-07-16/"
+  },
+  {
+    "date": "2026-07-15",
+    "title": "AI Digest — 2026-07-15",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "Anthropic Fable 5 extension",
+      "Cursor Sand agent",
+      "TSMC June revenue",
+      "Anthropic Samsung chip",
+      "Google Cloud Next Gemini Enterprise",
+      "Z.ai Tang Jie memo",
+      "Plug and Play Thales",
+      "AI cost task benchmarks."
+    ],
+    "description": "",
+    "url": "/d/2026-07-15/"
+  },
+  {
+    "date": "2026-07-14",
+    "title": "AI Digest — 2026-07-14",
+    "n_stories": 8,
+    "first_kicker": "[PRODUCT]",
+    "queries": [
+      "OpenAI GPT-5.6",
+      "Anthropic Claude",
+      "Google DeepMind Gemini",
+      "EU AI Act enforcement",
+      "Hugging Face trending",
+      "DeepSeek V4",
+      "AI security jailbreak",
+      "\"July 13 2026\" AI",
+      "arXiv breakthrough."
+    ],
+    "description": "",
+    "url": "/d/2026-07-14/"
+  },
+  {
+    "date": "2026-07-13",
+    "title": "AI Digest — 2026-07-13",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "Sutton Oak Lab Toronto",
+      "Soofi S 30B German consortium",
+      "Apple SpeechAnalyzer Whisper benchmark",
+      "Anthropic Claude India rupee",
+      "Gemini 3.5 Pro July 17",
+      "UAE AI chip export",
+      "China anthropomorphic AI",
+      "Mistral Robostral Navigate."
+    ],
+    "description": "",
+    "url": "/d/2026-07-13/"
+  },
+  {
+    "date": "2026-07-12",
+    "title": "AI Digest — 2026-07-12",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "OpenAI Apple lawsuit",
+      "Muse Spark 1.1",
+      "ChatGPT Work",
+      "CVE spike Mythos",
+      "SambaNova Series F",
+      "OpenAI families PM",
+      "Midjourney Hollywood",
+      "GPT-5.6 public rollout."
+    ],
+    "description": "",
+    "url": "/d/2026-07-12/"
+  },
+  {
+    "date": "2026-07-11",
+    "title": "AI Digest — 2026-07-11",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "GPT-5.6 Sol public release",
+      "ChatGPT Work Atlas sunset",
+      "Meta Muse Spark 1.1",
+      "SpaceXAI Grok 4.5",
+      "Anthropic IPO",
+      "METR pre-deployment eval",
+      "FCA UK LLM regulation",
+      "PyTorch 2.13 Apple Silicon."
+    ],
+    "description": "",
+    "url": "/d/2026-07-11/"
+  },
+  {
+    "date": "2026-07-10",
+    "title": "AI Digest — 2026-07-10",
+    "n_stories": 8,
+    "first_kicker": "[MODEL]",
+    "queries": [
+      "GPT-5.6 Sol launch",
+      "xAI Grok 4.5",
+      "Meta Muse Spark 1.1",
+      "Gemini 3.1 Pro",
+      "Hugging Face daily papers",
+      "SpaceX-Cursor deal",
+      "AI agent security."
+    ],
+    "description": "",
+    "url": "/d/2026-07-10/"
+  },
+  {
+    "date": "2026-07-09",
+    "title": "AI Digest — 2026-07-09",
+    "n_stories": 8,
+    "first_kicker": "[FUNDING]",
+    "queries": [
+      "AI news July 8 2026",
+      "EU AI Act Omnibus VII",
+      "SambaNova Series F",
+      "Anthropic jailbreak study",
+      "China CAC anthropomorphic AI",
+      "Hugging Face trending",
+      "Grok 4.5 release."
+    ],
+    "description": "",
+    "url": "/d/2026-07-09/"
+  },
+  {
+    "date": "2026-07-08",
+    "title": "AI Digest — 2026-07-08",
+    "n_stories": 0,
+    "first_kicker": "",
+    "queries": [
+      "GPT-5.6 release",
+      "Claude Sonnet 5",
+      "Gemini 3.5 Pro",
+      "Meta Muse Image",
+      "MiniMax M3",
+      "SambaNova funding",
+      "EU AI Act enforcement",
+      "GitHub Agentic Workflows vulnerability",
+      "MGX fund",
+      "Qwen-AgentWorld."
+    ],
+    "description": "",
+    "url": "/d/2026-07-08/"
+  }
+]

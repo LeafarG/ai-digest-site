@@ -1,0 +1,29 @@
+# AI Digest — 2026-07-13
+
+*8 stories · window 2026-07-12 06:00 → 2026-07-13 06:00 BRT · queries: Sutton Oak Lab Toronto, Soofi S 30B German consortium, Apple SpeechAnalyzer Whisper benchmark, Anthropic Claude India rupee, Gemini 3.5 Pro July 17, UAE AI chip export, China anthropomorphic AI, Mistral Robostral Navigate.*
+
+- **[MODEL] Turing laureate Richard Sutton launches Oak Lab in Toronto.** The 2024 Turing winner and co-founder of modern RL unveiled Oak Lab today, calling today's deep-learning stack "weak and inefficient" and betting on agents that learn continuously from their environment rather than from fixed offline corpora; the newco is hiring in Toronto and will publish research. Source: [the-decoder.com](https://the-decoder.com/turing-award-winner-rich-sutton-founds-oak-lab-to-build-ai-agents-that-learn-on-their-own/) · [machinebrief.com](https://www.machinebrief.com/news/rich-suttons-oak-lab-redefining-ai-agents-with-continuous-le-pknk)
+
+- **[OPEN-SOURCE] German consortium releases Soofi S 30B-A3B, a sovereign MoE trained on Deutsche Telekom's cloud.** Coordinated by the KI Bundesverband, the open-weight hybrid Mamba-Transformer activates only 3.2 B of 31.6 B parameters per token and keeps decode throughput nearly flat from 4K to 256K context; among fully open models it tops OLMo 3 32B and Apertus 70B on English, German and code suites (70.1 / 79.1 aggregate) and trains on a 27 T-token mix with the German share deliberately upweighted to 15.3 percent. Source: [the-decoder.com](https://the-decoder.com/german-ai-consortium-releases-soofi-s-an-open-30b-model-that-tops-benchmarks-in-both-english-and-german) · [soofi.info](https://www.soofi.info/soofi-s/)
+
+- **[MODEL] Google confirms Gemini 3.5 Pro is locked in for a 17 Jul GA after a full architectural rebuild.** Outlets reporting today say DeepMind scrapped the original 2.5 Pro base layer and restarted pre-training from scratch to close gaps in math, SVG and long-horizon agentic workflows; the public release is targeted at 2 M context, Deep Think reasoning, and roughly $15 / $60 per million in/out tokens, with Gemini 3.5 Flash still anchoring high-volume agent pipelines at $1.50 / $9.00. Source: [aitoolsrecap.com](https://aitoolsrecap.com/Blog/gemini-3-5-pro-july-17-launch-specs-pricing-2026) · [hackernoon.com](https://hackernoon.com/google-delays-gemini-35-pro-to-july-17-the-strategic-play-behind-the-scrapped-base-model)
+
+- **[PRODUCT] Anthropic rolls out rupee-denominated Claude pricing for India.** Starting today Indian users see Claude Pro at ₹1,999 / month, with Claude Max at ₹9,900 (~5× usage) and ₹19,900 (~20× usage), positioning Anthropic against ChatGPT Plus (~₹2,000) and Gemini Advanced; India is now Claude's second-largest market after the US and the company is preparing a Bengaluru office. Source: [techcrunch.com](https://techcrunch.com/2026/07/13/anthropic-starts-localizing-claude-pricing-for-india-its-biggest-market-after-the-us) · [republicworld.com](https://www.republicworld.com/tech/anthropic-reveals-claude-ai-pricing-in-india-plans-start-at-1999-per-month-2026-07-13-132180)
+
+- **[MODEL] Mistral ships Robostral Navigate, its first embodied navigation model.** The 8 B checkpoint steers robots from a single RGB camera and natural-language instructions, was trained entirely in simulation, and supports multiple robot types; Mistral says it lands "state-of-the-art" on standard navigation benchmarks with markedly less compute than prior embodied baselines. Source: [mistral.ai](https://mistral.ai/news/robostral-navigate/) · [releasebot.io](https://releasebot.io/updates/mistral)
+
+- **[TOOLING] First independent benchmark shows Apple's SpeechAnalyzer beats every Whisper size on-device.** Inscribe's 5,559-utterance LibriSpeech test on an M2 Pro puts SpeechAnalyzer at 2.12 percent WER on test-clean and 4.56 on test-other — a 3.5–4× improvement over Apple's own legacy SFSpeechRecognizer and ahead of Whisper Small (3.74 / 7.95) at ~3× faster decode, validating the new API for any Mac dictation product still on the old stack. Source: [get-inscribe.com](https://get-inscribe.com/blog/apple-speech-api-benchmark.html)
+
+- **[POLICY] US reclassifies the UAE into Country Group A:5, removing licensing for advanced AI-chip exports.** The Commerce Department shift, effective for approved Emirati entities, clears the way for higher-tier accelerators into UAE data centres without individual licences — a strategic geopolitical move that simultaneously rewards Gulf capex and tightens the China-Russia perimeter. Source: [thors-terminal-briefings.ghost.io](https://thors-terminal-briefings.ghost.io/the-2026-07-11-intel) · [aitoolsrecap.com](https://aitoolsrecap.com/Blog/ai-news-july-11-2026)
+
+- **[POLICY] China's "Anthropomorphic AI Interaction Services" rules take effect 15 Jul.** The Interim Measures cover human-like AI companions — disclosure of synthetic identity, content moderation, age gating and explicit user consent for emotional scenarios — and will land in force three days from now, forcing every model serving Chinese users to refresh its UI and policy stack. Source: [aitoolsrecap.com](https://aitoolsrecap.com/Blog/ai-news-july-11-2026) · [houdao.com](https://www.houdao.com/d/16214-Apple-Sues-OpenAI-for-Trade-Secret-Theft-SK-hynix-Hits-Record-High-with-IPO-and-Humanoid-Robot-Achieves-Surgical-Breakthrough)
+
+## Coming up (next 48 h)
+
+- **Tue 2026-07-14** — OpenAI GPT-5.6 "Sol" / GPT-Live: first third-party voice-quality benchmarks expected.
+- **Tue 2026-07-14** — Apple vs OpenAI: preliminary-injunction filing deadline in the Northern District of California.
+- **Wed 2026-07-15** — China Interim Measures for Anthropomorphic AI Interaction Services become enforceable.
+- **Fri 2026-07-17** — Google DeepMind Gemini 3.5 Pro targeted GA with 2 M context and Deep Think.
+
+---
+*Generated 2026-07-13 08:55 BRT by OpenClaw daily-ai-digest-0600-brt.*

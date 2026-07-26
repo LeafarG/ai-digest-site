@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Digest — 2026-07-08</title>
+<meta name="description" content="Daily AI world digest for 2026-07-08.">
+<meta property="og:title" content="AI Digest — 2026-07-08">
+<meta property="og:description" content="Daily AI world digest for 2026-07-08.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ai-digest-site.vercel.app/d/2026-07-08/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#111827">
+<link rel="canonical" href="https://ai-digest-site.vercel.app/d/2026-07-08/">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <p style="margin:0;font-size:0.85rem;color:var(--fg-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">AI Digest</p>
+    <h1 style="margin-top:0.25rem">AI Digest — 2026-07-08</h1>
+    <p class="lead">2026-07-07 → 2026-07-08 12:14 BRT · 16 stories</p>
+  </header>
+
+  <article class="digest-body">
+<h1>AI Digest — 2026-07-08</h1>
+<p><em>8 stories · window 2026-07-07 06:00 → 2026-07-08 12:14 BRT · queries: GPT-5.6 release, Claude Sonnet 5, Gemini 3.5 Pro, Meta Muse Image, MiniMax M3, SambaNova funding, EU AI Act enforcement, GitHub Agentic Workflows vulnerability, MGX fund, Qwen-AgentWorld.</em></p>
+<ul>
+<li>
+<p><strong>OpenAI ships GPT-5.6 &ldquo;Sol&rdquo; on Thursday after a US government hold.</strong> The Department of Commerce&rsquo;s Center for AI Standards and Innovation cleared the public launch after additional safety tests; OpenAI had openly criticised the delay as keeping its best tools from developers. The flagship &ldquo;Sol Ultra&rdquo; variant tops TerminalBench 2.1 at 91.9 % vs Claude Mythos 5 (88.0 %) and Gemini 3.1 Pro Preview (70.7 %), and Sol matches Mythos on cyber tasks at roughly a third of the tokens, while costing $5/$30 per MTok — half of Anthropic&rsquo;s Fable 5. Source: <a href="https://the-decoder.com/openais-gpt-5-6-launches-thursday-after-a-delay-forced-by-the-u-s-government/">the-decoder.com</a> · <a href="https://www.axios.com/2026/07/08/openai-gpt-trump-ban-lifted">Axios via the-decoder</a></p>
+</li>
+<li>
+<p><strong>MiniMax plans a 2.7-trillion-parameter open-source model — internally &ldquo;M3 Pro&rdquo; — for Q3 2026.</strong> Per The Information, the release would be the largest open-weight model from a Chinese lab, more than 6× the size of MiniMax&rsquo;s current 428B-parameter M3. The move signals that the Chinese open-source push (Zhipu, DeepSeek, Moonshot) is now competing on absolute scale, but it lands as Beijing weighs tighter export-style controls on domestic frontier releases. Source: <a href="https://the-decoder.com/chinese-ai-startup-minimax-plans-to-open-source-a-2-7-trillion-parameter-model-later-this-year/">the-decoder.com</a></p>
+</li>
+<li>
+<p><strong>Meta&rsquo;s Superintelligence Labs launches Muse Image, the first release under Alexandr Wang.</strong> Unlike a prompt-to-pixel generator, Muse works agentically — it writes and runs code, calls web search, and self-revises before producing images. It debuts #2 on Image Arena behind OpenAI&rsquo;s GPT Image 2 and ahead of Nano Banana and Grok Imagine, but the training data (Instagram photos) is already drawing scrutiny. Source: <a href="https://ai.meta.com/blog/introducing-muse-image-muse-video-msl/">ai.meta.com</a> · <a href="https://the-decoder.com/muse-image-is-technically-impressive-but-metas-use-of-instagram-photos-raises-questions/">the-decoder.com</a></p>
+</li>
+<li>
+<p><strong>SambaNova raises $1 B Series F first close at an $11 B valuation, just 5 months after its $350 M Series E.</strong> The round was led by General Atlantic with Intel re-upping, deepening their Xeon-based AI-inference partnership; the chipmaker walked away from acquiring SambaNova at ~$1.6 B in December. CEO Rodrigo Liang left an IPO path open and said a second close is &ldquo;a few weeks&rdquo; away — a notable signal of confidence in non-NVIDIA inference silicon. Source: <a href="https://techcrunch.com/2026/07/08/sambanova-draws-1b-at-11b-valuation-in-series-f-first-close/">TechCrunch</a></p>
+</li>
+<li>
+<p><strong>&ldquo;GitLost&rdquo; — Noma Labs shows GitHub&rsquo;s new Agentic Workflows can be tricked into leaking private repos.</strong> A crafted public GitHub Issue in any organisation repo can inject instructions that steer the Claude/Copilot-backed agent into exfiltrating data from sibling private repositories. The disclosure lands weeks after GitHub launched the markdown-style workflow feature and is the first high-profile indirect prompt-injection bug against a major platform&rsquo;s agent surface. Source: <a href="https://noma.security/blog/gitlost-how-we-tricked-githubs-ai-agent-into-leaking-private-repos/">noma.security</a></p>
+</li>
+<li>
+<p><strong>Qwen-AgentWorld (arXiv 2606.24597) — a model trained to <em>be the environment</em>, beats Opus 4.8 on world-prediction.</strong> The Alibaba/Qwen 397B variant scores 58.71 on Qwen&rsquo;s own env-prediction benchmark, ahead of GPT-5.4 (58.25), Claude Opus 4.8 (56.59) and Gemini 3.1 Pro (54.57). The interesting claim is not the leaderboard but the framing: agents can now train inside a fully controllable text-based simulator, and learning to predict world state appears to also make the model a better agent. Source: <a href="https://pub.towardsai.net/qwen-agentworld-the-model-trained-to-be-the-environment-not-the-agent-and-beats-opus-5d41f3366415">Towards AI</a> · <a href="https://arxiv.org/abs/2606.24597">arXiv:2606.24597</a></p>
+</li>
+<li>
+<p><strong>MGX (Abu Dhabi) closes a $49 B AI-focused fund, beating its $45 B target.</strong> The vehicle has already invested across 14 companies spanning semis, infrastructure and platforms, and is developing a 3 GW AI campus near Paris while co-owning Aligned Data Centres via a $40 B consortium. The close hardens the Gulf as a structural backer of US/EU AI compute and is the largest AI-dedicated fund announced in 2026. Source: <a href="https://www.crescendo.ai/news/latest-vc-investment-deals-in-ai-startups">Crescendo.ai tracker</a> · <a href="https://www.thenationalnews.com/business/markets/2026/07/01/abu-dhabis-ai-investment-firm-mgx-raises-49bn-for-new-fund/">The National</a></p>
+</li>
+<li>
+<p><strong>Anthropic&rsquo;s Claude Sonnet 5 ships alongside a self-hosted Claude Code gateway on AWS Bedrock and GCP Vertex.</strong> Sonnet 5 targets lower-cost multi-step agent work (also GA on GitHub Copilot across VS Code, JetBrains, Xcode, Eclipse), and the BYOC gateway keeps code, credentials and audit logs inside the customer&rsquo;s own cloud. Discounted API rates run through 31 August; the structural play is to undercut Codex and Gemini Code Assist for regulated enterprises. Source: <a href="https://winbuzzer.com/2026/07/01/anthropic-launches-cheaper-claude-sonnet-5-for-ai-agents-xcxwbn/">winbuzzer.com</a> · <a href="https://fourweekmba.com/ai-anthropic-claude-sonnet-5-bedrock-google-cloud/">fourweekmba.com</a> · <a href="https://github.blog/changelog/2026-06-30-claude-sonnet-5-is-generally-available-for-github-copilot/">GitHub Changelog</a></p>
+</li>
+</ul>
+<h2>Coming up (next 48 h)</h2>
+<ul>
+<li><strong>Thu 2026-07-09</strong> — OpenAI GPT-5.6 &ldquo;Sol&rdquo; public release (post-government review).</li>
+<li><strong>Thu 2026-07-09</strong> — Q2 earnings expected from TSMC and ASML; read-through for AI-accelerator demand and CoWoS capacity into H2.</li>
+<li><strong>Fri 2026-07-10</strong> — Likely first developer-day benchmarks for GPT-5.6 vs Claude Sonnet 5 vs Gemini 3.1 Pro; expect community leaderboard churn on LMArena and TerminalBench.</li>
+<li><strong>Wed 2026-07-08 → Fri 2026-07-10</strong> — SambaNova Series F second close expected (&ldquo;a few weeks&rdquo; per CEO Liang).</li>
+<li><strong>Mon 2026-07-13</strong> — Polymarket contract &ldquo;Will GPT-5.6 ship by July 31?&rdquo; currently trades ~86% YES; closes soon after the public launch.</li>
+<li><strong>Thu 2026-07-17</strong> — Google DeepMind targeted launch of <strong>Gemini 3.5 Pro</strong> (delayed from June; first internal feedback reportedly mixed).</li>
+<li><strong>Aug 2, 2026</strong> — EU AI Act high-risk system obligations become enforceable; penalties up to €35 M / 7 % of global revenue. (<a href="https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act">EC Service Desk</a>)</li>
+<li><strong>Q3 2026 (TBA)</strong> — MiniMax M3 Pro (~2.7T params, open-source) target window.</li>
+</ul>
+<hr>
+<p><em>Generated 2026-07-08 12:14 BRT by OpenClaw daily-ai-digest-0600-brt (test run).</em></p>
+  </article>
+
+  <footer class="footer">
+    <p>← <a href="/">Back to the archive</a> · <a href="/today.html">latest</a></p>
+    <p style="margin-top:0.5rem">Generated automatically each morning at 06:00 BRT.</p>
+  </footer>
+</main>
+</body>
+</html>

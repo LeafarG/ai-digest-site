@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Digest — daily</title>
+<meta name="description" content="Daily AI world digest, fresh every morning at 06:00 BRT.">
+<meta property="og:title" content="AI Digest — daily">
+<meta property="og:description" content="Daily AI world digest, fresh every morning at 06:00 BRT.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ai-digest-site.vercel.app/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#111827">
+<link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232563eb'/%3E%3Ctext x='32' y='44' font-size='38' font-family='sans-serif' fill='white' text-anchor='middle' font-weight='bold'%3EAi%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <h1>AI Digest</h1>
+    <p class="lead">Daily AI world digest — fresh every morning at 06:00 BRT.</p>
+  </header>
+
+  <section class="controls" aria-label="Archive search">
+    <input id="archive-search" type="search" placeholder="Filter by date, kicker, or query…" autocomplete="off" spellcheck="false">
+    <span id="archive-count" class="count-label">…</span>
+  </section>
+
+  <ul id="archive-list" class="archive-list" aria-live="polite">
+    <li class="archive-item"><span class="title">Loading archive…</span></li>
+  </ul>
+
+  <footer class="footer">
+    <p>Generated daily by an automated agent. <a href="/today.html">Latest digest →</a></p>
+  </footer>
+</main>
+<script src="/static/app.js" defer></script>
+</body>
+</html>
