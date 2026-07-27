@@ -1,163 +1,122 @@
-# ai-digest-site — SPEC
+# ai-morning-letter — SPEC
 
-Static website that hosts the daily AI world digest with one addressable page per
-day. Replaces the previous PDF-pushed Telegram delivery with a public, searchable,
-Git-backed surface that updates every morning via cron → git push → Vercel auto-deploy.
+Static website that hosts the daily AI world digest ("AI Morning Letter") with one addressable page per day. Replaces the previous PDF-pushed Telegram delivery with a permanent, searchable, brand-hosted, Git-backed surface that updates every morning via cron → git commit → `vercel deploy --prod` → brand-alias swap.
 
 ## 1. Purpose
 
-- Surface: a permanent Vercel-hosted website (`https://ai-digest.vercel.app`).
-- Update cadence: daily, 06:00 America/Sao_Paulo, automatic.
-- Source of truth: a Markdown file per day (`d/<YYYY-MM-DD>/digest.md`).
-- Telegram topic behavior changes: a one-line "today's digest is live at <url>"
-  post replaces the previous long-form Markdown + PDF attachment. The deep content
-  lives on the site; the topic exists for awareness.
+- **Surface:** a permanent Vercel-hosted website at the brand canonical alias [`https://ai-morning-letter.vercel.app/`](https://ai-morning-letter.vercel.app/).
+- **Update cadence:** daily, 06:00 America/Sao_Paulo, automatic via the `daily-morning-letter-0600-brt` cron job.
+- **Source of truth:** a Markdown file per day (`d/<YYYY-MM-DD>/digest.md`).
+- **Telegram topic behavior:** a one-line `Today's Morning Letter is live: <url>` post replaces the previous long-form Markdown + PDF attachment. The deep content lives on the site; the topic exists for awareness.
 
 ## 2. Stack and topology
 
-- Pure static site. No framework, no build step. Matches the existing pattern
-  used by `projects/llm-presentation`.
-- Git-backed deploy: push to `main` → Vercel auto-deploys via the GitHub App
-  (link-API pattern, per MEMORY 2026-07-07).
-- Repository: `LeafarG/ai-digest-site` on GitHub. Visibility: **public** (the
-  digest content is news, no credentials or PII; public also gives the boss a
-  permanent, shareable URL). Local mirror:
-  `D:\.openclaw\repos\ai-digest-site.git` (bare).
-- Working tree: `D:\.openclaw\workspace\projects\ai-digest-site\`.
+- **Pure static site.** No framework, no build step. Matches the existing pattern used by `projects/llm-presentation` and `projects/sp500-digest-site`.
+- **Daily deploy:** `node scripts/publish_site.js --date <YYYY-MM-DD>` runs `vercel deploy --prod` from the working tree.
+- **Git-backed secondary deploy:** push to `main` triggers a Vercel GitHub-App auto-deploy (link-API pattern). The cron-driven `publish_site.js` deploy is the canonical source of truth (it swaps the brand alias onto the new prod deploy).
+- **Repository:** `LeafarG/ai-morning-letter` on GitHub (renamed from `LeafarG/ai-digest-site` on 2026-07-27). Visibility: **public** (the digest content is news, no credentials or PII; public also gives the boss a permanent, shareable URL).
+- **Working tree:** `D:\.openclaw\workspace\projects\ai-digest-site\` (on-disk directory name kept for continuity even though the brand has changed).
 
 ## 3. Directory layout
 
 ```
-projects/ai-digest-site/                 # working tree (deployable)
-├── .git/                                # linked to bare + GitHub remote
-├── .gitignore                           # ignore .DS_Store, *.swp, __pycache__
-├── README.md                            # what this is, link to live site
-├── SPEC.md                              # this file
-├── index.html                           # archive list (loads archive.json)
-├── archive.json                         # manifest: [{date, title, n_stories, url}]
-├── today.html                           # redirect → latest d/YYYY-MM-DD/
+.
+├── index.html              # Archive landing (kicker filters + search + monthly card grid)
+├── today.html              # Meta-refresh redirect to the latest edition
+├── archive.json            # JSON manifest consumed by index.html
+├── README.md               # Public-facing project doc
+├── SPEC.md                 # This file — formal project spec
+├── CHANGELOG.md            # Release history (Keep-a-Changelog format)
+├── LICENSE                 # MIT
+├── MEMORY.md               # Agent-side operational notes (internal)
+├── .gitignore              # Python, Node, IDE, OS, env, secrets
+├── .last-deploy-url        # Ephemeral handoff file (cron reads it for the reply URL)
+│
 ├── d/
 │   └── YYYY-MM-DD/
-│       ├── index.html                   # rendered, UTF-8-clean digest
-│       └── digest.md                    # raw markdown source
+│       ├── digest.md       # Raw Markdown source
+│       ├── index.html      # Rendered per-day page
+│       └── og.png          # 1200 × 630 OG image (social previews)
+│
 ├── static/
-│   ├── styles.css                       # shared minimal CSS
-│   └── app.js                           # loads archive.json and renders list
+│   ├── styles.css          # Shared CSS (typography, layout, category palette, dark mode)
+│   └── app.js              # Archive loader + kicker filters + search
+│
 └── scripts/
-    ├── render_html.py                   # markdown → standalone HTML (UTF-8)
-    └── publish_site.ps1                 # cron-driven import + commit + push
+    ├── render_html.py      # Markdown → standalone HTML (UTF-8-clean, mojibake guard)
+    ├── render_og.py        # Pillow-based 1200 × 630 PNG generator
+    ├── rebuild_archive.js  # Emits archive.json + today.html from d/*/digest.md
+    └── publish_site.js     # Daily orchestrator: render → OG → archive → commit → deploy → alias swap
 ```
 
-## 4. Per-day page
+## 4. Per-day content shape
 
-Each `d/YYYY-MM-DD/index.html`:
+Each `d/<YYYY-MM-DD>/digest.md` looks like:
 
-- Single self-contained document with embedded CSS so it renders identically when
-  shared as a URL preview (Slack, Telegram, etc.).
-- Title tag: `AI Digest — YYYY-MM-DD` (em-dash U+2014, NOT a question mark).
-- Open Graph: `og:title`, `og:description` (short excerpt of the lead story).
-- Footer block: link to the archive (`← Back to the archive`) and to the next
-  day's page if it exists; the date window (`window YYYY-MM-DD HH:MM →
-  YYYY-MM-DD HH:MM BRT`); the source-link list.
-- Sibling `digest.md` ships in the same folder for archival and copy/paste.
+```markdown
+# Morning Letter — 2026-07-27
 
-## 5. Front page
+*8 stories · window 2026-07-26 06:00 → 2026-07-27 06:00 BRT · queries: q1, q2, q3.*
 
-- `index.html` displays the title "AI Digest" plus a one-line description
-  ("Daily AI world digest, fresh every morning at 06:00 BRT").
-- On load, `static/app.js` fetches `archive.json` and renders a chronological
-  list (newest first) of every digest with: date (link), title, story count,
-  query names.
-- A search box filters by date, title, or kicker (e.g. `[MODEL]`, `[FUNDING]`).
-- The list also groups by month with `### July 2026` headings for long spans.
+- **[MODEL] OpenAI ships GPT-5.6 "Sol" on Thursday...** Summary sentence. Source: [a](url) · [b](url2)
+- **[PRODUCT] Meta's Superintelligence Labs launches Muse Image...** Summary. Source: [a](url)
 
-## 6. Daily pipeline (`daily-ai-digest-0600-brt`)
+## Coming up (next 48 h)
 
-The cron is the single trigger. Steps the running agent will execute:
+- **Mon 2026-07-27** — One sentence.
+- **Tue 2026-07-28** — One sentence.
 
-1. **Research** (≤ 7 min): existing prompt, unchanged. Produce `N` stories +
-   "Coming up (next 48 h)" + footer.
-2. **Save the Markdown**: write directly to
-   `d/<YYYY-MM-DD>/digest.md` (not the old `projects/ai-digest/digests/`
-   tree). The legacy tree becomes a static back-up of historical digests.
-3. **Render HTML**: `python scripts/render_html.py d/<YYYY-MM-DD>/digest.md
-   d/<YYYY-MM-DD>/index.html`. UTF-8 throughout; em-dash is preserved.
-4. **Regenerate archive.json**: `node scripts/rebuild_archive.js` (reads
-   every `d/*/digest.md`, emits `archive.json`). Bumps front of the list with
-   today's entry.
-5. **Refresh `today.html`**: simple `mv today.html today.html.prev ; echo
-   '<meta http-equiv="refresh" content="0; url=d/YYYY-MM-DD/">' >
-   today.html` (or an actual meta-refresh HTML stub). Keeps the URL stable
-   for any Telegram/chat links that hard-code `/today.html`.
-6. **Commit + push**: `git add . && git commit -m "feat(digest): YYYY-MM-DD
-   edition" && git push origin main`. Vercel auto-deploys.
-7. **Telegram topic reply**: ONE line of text only — no PDF attachment, no
-   long body:
-   `Today's AI digest is live: https://ai-digest.vercel.app/d/YYYY-MM-DD/`
+---
+*Generated 2026-07-27 06:00 BRT by OpenClaw daily-morning-letter-0600-brt.*
+```
 
-The previous `md_to_pdf.py` PDF-rendering step is **removed**. PDFs are no
-longer produced; the Vercel site supersedes them.
+The `**[KICKER]` tag is one of exactly eight values (case-sensitive, in brackets):
 
-## 7. Render quality rules (anti-mojibake)
+| Kicker | Hex | Use for |
+|---|---|---|
+| `MODEL` | `#4f46e5` indigo | base model release or major version |
+| `PRODUCT` | `#7c3aed` violet | new product, SDK, GA release |
+| `RESEARCH` | `#059669` emerald | paper, benchmark, novel training/eval method |
+| `FUNDING` | `#d97706` amber | raise, M&A, fund close |
+| `POLICY` | `#dc2626` red | regulation, executive order, compliance |
+| `SECURITY` | `#ea580c` orange | vulnerability, leak, exploit, jailbreak |
+| `TOOLING` | `#0891b2` cyan | IDE/copilot plugin, gateway, dev tooling |
+| `OPEN-SOURCE` | `#0d9488` teal | notable open-weight release, HF trending |
 
-- `render_html.py` reads with explicit UTF-8 (`encoding='utf-8'` on `open()`),
-  writes with explicit UTF-8 (`open(..., 'w', encoding='utf-8')`).
-- All `<meta charset>` is set to `utf-8`.
-- Title and any U+2014 em-dash strings are written as raw characters, never
-  `?` or `&#8212;` substitutions.
-- Self-test: after rendering, the script greps the produced HTML for the
-  expected `AI Digest — YYYY-MM-DD` title; if the title byte sequence is not
-  present, the script exits non-zero. This catches encoder regressions.
+Legacy digests without the `[KICKER]` tag (the 19 backfilled editions from 2026-07-08 to 2026-07-26) get a heuristic kicker inferred from keyword cues in the headline + body (`infer_kicker()` in `render_html.py`).
 
-## 8. Backfill
+## 5. Daily pipeline
 
-- Read every `*.md` from `projects/ai-digest/digests/` (legacy tree).
-- Render every one with `render_html.py` into `d/YYYY-MM-DD/index.html`.
-- Copy the source `.md` to `d/YYYY-MM-DD>/digest.md`.
-- Confirm each render is mojibake-free before adding to git.
-- Generate initial `archive.json`. Sorted newest first.
-- One squashed commit: `feat(site): backfill 19 archived digests (2026-07-08
-  → 2026-07-26)`.
+1. **Cron trigger.** `daily-morning-letter-0600-brt` (`0 6 * * *` in `America/Sao_Paulo`) wakes an isolated agent session.
+2. **Research.** Agent uses `web_search` / `web_fetch` to find AI news from the last 24 h. Clusters 5–10 top stories.
+3. **Compose.** Agent writes `d/<YYYY-MM-DD>/digest.md` (UTF-8, `[KICKER] Headline.**` bullets, sources as `[label](url)`).
+4. **Publish.** Agent runs `node scripts/publish_site.js --date <YYYY-MM-DD>`. The script:
+   1. `scripts/render_html.py` → `d/<date>/index.html` (UTF-8 clean, em-dash verified).
+   2. `scripts/render_og.py` → `d/<date>/og.png` (1200 × 630 PNG).
+   3. `scripts/rebuild_archive.js` → fresh `archive.json` + `today.html`.
+   4. `git add -A && git commit -m "feat(digest): <date> edition"` (no push).
+   5. `vercel deploy --prod --yes --scope leafargs-projects`.
+   6. POST `ai-morning-letter.vercel.app` alias onto the new prod deploy; DELETE it from older prod deploys (Vercel doesn't auto-attach the bare alias after a project rename).
+   7. Writes `.last-deploy-url` with `deploy=`, `digest=`, `date=`, `per_deploy=`, `aliases=`.
+5. **Deliver.** Agent reads `.last-deploy-url`, replies with the `digest=` URL on a single line.
 
-## 9. Vercel topology
+## 6. Mojibake guard
 
-- Project: `ai-digest-site` (URL: `https://ai-digest-site.vercel.app` if
-  `ai-digest` is unavailable; verify first via `vercel project ls`).
-- Production branch: `main`. Auto-deploy on push via the GitHub App on
-  `LeafarG`. Per-project SSO protection disabled (per the 2026-06-30 MEMORY
-  rule — preview URLs must be publicly readable).
-- Custom domain: out of scope for v1. Default Vercel URL only.
+`render_html.py` enforces UTF-8 throughout. After writing each per-day HTML, it self-checks that the title byte sequence `Morning Letter \u2014 YYYY-MM-DD` is byte-present in the file. If it's missing, the script exits non-zero and the cron fails loudly.
 
-## 10. Cron changes
+This self-check caught the 2026-07-26 mojibake regression (the legacy renderer wrote `\u2014` as `?`); that edition is now re-rendered with em-dash bytes intact.
 
-- Existing cron `daily-ai-digest-0600-brt` prompt will be patched:
-  - Output path: `projects/ai-digest/digests/YYYYMMDD_aidigest.md` →
-    `projects/ai-digest-site/d/YYYY-MM-DD/digest.md`.
-  - Add new steps 3-6 (render → archive → today.html → push) per §6.
-  - Remove PDF render and MEDIA: attachment rules.
-  - Topic reply is now step 7 only — one line with the URL, no body, no
-    attachment.
-- Timeout stays at 600 s. Measured last-duration was 344 s; new flow
-  adds ≈ 10 s, still well within budget.
-- Failure alert stays the same: 2 consecutive misses, 24 h cooldown, to the
-  same topic.
+## 7. Alias plumbing
 
-## 11. Success criteria
+- **Canonical brand alias:** `https://ai-morning-letter.vercel.app/` (manually swapped onto the latest prod deploy after every publish by `publish_site.js ensureBrandAlias()`).
+- **Legacy alias:** `https://ai-digest-site-pink.vercel.app/` (auto-attached to every prod deploy from the pre-rename project config; kept as a courtesy redirect).
+- **Default per-deploy aliases:** `https://ai-morning-letter-<hash>-leafargs-projects.vercel.app/` and `https://ai-morning-letter-git-main-leafargs-projects.vercel.app/` (auto-generated by Vercel).
 
-1. `curl -sI https://ai-digest-site.vercel.app/` → `200`.
-2. `curl -s https://ai-digest-site.vercel.app/archive.json` → valid JSON
-   listing all digests.
-3. `curl -s https://ai-digest-site.vercel.app/d/2026-07-26/` → `200`,
-   page title contains `AI Digest — 2026-07-26` with a proper em-dash.
-4. No mojibake in any rendered page (sampled manually + scripted).
-5. Cron run (`cron run`) creates a new commit on `main` within 30 s and
-   Vercel surfaces the new digest URL within 60 s.
-6. Telegram topic receives a one-line post with the URL and no PDF.
+## 8. Out of scope (v2)
 
-## 12. Out of scope (v1)
-
-- Email newsletter, RSS feed, Twitter cross-post.
-- Custom domain (`aidigest.com` etc.).
-- Per-day OG image generation.
-- Search indexed by full-text client-side (a simple keyword filter suffices).
-- Tags / kicker-based browsing beyond a single keyword search box.
+- Email newsletter, RSS, Twitter cross-post.
+- Custom domain (`aimorningletter.com` etc.).
+- Per-day OG image variant per kicker (currently one OG image per edition, first story as the lead).
+- Tags / kicker-based browsing beyond the inline chip filters on the archive.
+- Removing the legacy `ai-digest-site-pink.vercel.app` alias.
+- The legacy `projects/ai-digest/digests/` PDF tree is kept for historical reference only.
