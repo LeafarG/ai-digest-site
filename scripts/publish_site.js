@@ -187,19 +187,15 @@ function extractDeployInfo(output) {
 
 function readToken() {
   // Pull the Vercel CLI's OAuth token from its XDG config dir.
-  const path = path.join(process.env.USERPROFILE || process.env.HOME || "", ".vercel", "auth.json");
-  try {
-    const j = JSON.parse(fs.readFileSync(path, "utf8"));
-    return j.token || j["// Note"] ? "" : ""; // placeholder; real impl below
-  } catch (_) {}
-  // Real path on Windows + Vercel CLI 54.x: %AppData%\xdg.data\com.vercel.cli\auth.json
   const candidates = [];
-  if (process.env.APPDATA) candidates.push(path.join(process.env.APPDATA, "xdg.data", "com.vercel.cli", "auth.json"));
-  if (process.env.HOME) candidates.push(path.join(process.env.HOME, ".config", "com.vercel.cli", "auth.json"));
+  if (process.env.USERPROFILE) candidates.push(require("path").join(process.env.USERPROFILE, ".vercel", "auth.json"));
+  if (process.env.HOME) candidates.push(require("path").join(process.env.HOME, ".vercel", "auth.json"));
+  if (process.env.APPDATA) candidates.push(require("path").join(process.env.APPDATA, "xdg.data", "com.vercel.cli", "auth.json"));
+  if (process.env.HOME) candidates.push(require("path").join(process.env.HOME, ".config", "com.vercel.cli", "auth.json"));
   for (const p of candidates) {
     try {
       const j = JSON.parse(fs.readFileSync(p, "utf8"));
-      if (j.token) return j.token;
+      if (j && j.token) return j.token;
     } catch (_) {}
   }
   return "";
