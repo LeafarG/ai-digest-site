@@ -6,3 +6,5 @@ __pycache__/
 node_modules/
 
 .vercel
+publish.log
+.trigger.txt
