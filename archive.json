@@ -2,10 +2,17 @@
   {
     "date": "2026-07-27",
     "title": "AI Digest — 2026-07-27",
-    "n_stories": 2,
-    "first_kicker": "[MODEL]",
+    "n_stories": 8,
+    "first_kicker": "[OPEN-SOURCE]",
     "queries": [
-      "cron-flow simulation."
+      "Kimi K3 open weights",
+      "OpenAI sandbox breach HF",
+      "CXMT IPO",
+      "EU AI Act Omnibus",
+      "Terence Tao AI math",
+      "Nadella CNN",
+      "Stanford AI labor",
+      "OpenRouter Chinese models."
     ],
     "description": "",
     "url": "/d/2026-07-27/"
