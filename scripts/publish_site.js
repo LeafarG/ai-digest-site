@@ -53,31 +53,42 @@ function stripAnsi(s) {
   return String(s || "").replace(/\u001b\[[0-9;]*[A-Za-z]/g, "");
 }
 
+// Brand alias — written by hand into publish_site.js so .last-deploy-url
+// always carries the right canonical URL for the cron agent to read.
+const PRIMARY_HOST = "ai-morning-letter.vercel.app";
+
 function extractDeployInfo(output) {
   const raw = stripAnsi(output);
   const lines = raw.split(/\r?\n/);
-  let aliased = null;
+  const aliasedSet = [];
   let production = null;
   let perDeploy = null;
   for (const rawLine of lines) {
     const line = stripAnsi(rawLine);
     let m;
-    if ((m = line.match(/Aliased\s+(https?:\/\/\S+)/))) aliased = m[1].trim();
-    else if ((m = line.match(/Production\s+(https?:\/\/\S+)/))) production = m[1].trim();
-    // Accept the new brand name *and* the old one (historical deploys may
-    // still appear in this session's output before the rename propagates).
-    else if ((m = line.match(/(https?:\/\/(?:ai-morning-letter|ai-digest-site)-[a-z0-9]+\.vercel\.app\/?)/))) {
-      perDeploy = m[1].trim();
-      if (!perDeploy.endsWith("/")) perDeploy += "/";
+    if ((m = line.match(/Aliased\s+(https?:\/\/\S+)/))) {
+      aliasedSet.push(m[1].trim().replace(/\/$/, ""));
+    } else if ((m = line.match(/Production\s+(https?:\/\/\S+)/))) {
+      production = m[1].trim().replace(/\/$/, "");
+    } else if ((m = line.match(/(https?:\/\/(?:ai-morning-letter|ai-digest-site)-[a-z0-9]+\.vercel\.app\/?)/))) {
+      const url = m[1].trim().replace(/\/$/, "");
+      if (url !== production) perDeploy = url;
     }
   }
-  if (!aliased && !production && !perDeploy) {
+  if (aliasedSet.length === 0 && !production && !perDeploy) {
     throw new Error("could not parse any Vercel URL from output");
   }
-  // Prefer the stable production alias (e.g. ai-morning-letter.vercel.app),
-  // then the per-deploy URL, then fall back to whatever we have.
-  const canonical = (aliased || production || perDeploy).replace(/\/$/, "");
-  return { aliased, production, perDeploy, canonical };
+  // Priority for the cron agent's reply URL:
+  //  1) The brand alias (PRIMARY_HOST) if Vercel attached it.
+  //  2) Otherwise, the production URL.
+  //  3) Otherwise, the per-deploy URL.
+  let canonical = `https://${PRIMARY_HOST}`;
+  if (!aliasedSet.includes(canonical)) {
+    canonical = (production || perDeploy);
+  }
+  // First aliased URL is also reported for legacy tooling.
+  const aliased = aliasedSet[0] || null;
+  return { aliased, production, perDeploy, canonical, aliasedSet };
 }
 
 (async function main() {
@@ -132,12 +143,18 @@ function extractDeployInfo(output) {
   ];
   if (info.perDeploy) lines.push("per_deploy=" + info.perDeploy);
   if (info.aliased) lines.push("alias=" + info.aliased);
+  if (info.aliasedSet && info.aliasedSet.length > 0) {
+    lines.push("aliases=" + info.aliasedSet.join(","));
+  }
   fs.writeFileSync(lastUrlFile, lines.join("\r\n") + "\r\n", "utf8");
   console.log("[publish_site] OK");
   console.log("  canonical = " + canonical);
   console.log("  digest    = " + digestUrl);
   if (info.perDeploy) console.log("  per_deploy= " + info.perDeploy);
   if (info.aliased) console.log("  alias     = " + info.aliased);
+  if (info.aliasedSet && info.aliasedSet.length > 1) {
+    console.log("  aliasedSet= " + info.aliasedSet.join(","));
+  }
 })().catch((e) => {
   console.error("[publish_site] FAILED: " + (e && e.message ? e.message : e));
   process.exit(1);
