@@ -138,15 +138,29 @@ function extractDeployInfo(output) {
   //    so the cron agent's reply URL stays stable on the new host.
   const brandUrl = `https://${PRIMARY_HOST}`;
   const newDeployUrl = (extractDeployInfo(allOut).production || "").replace(/^https?:\/\//, "https://");
-  // Note: production line gives us "https://ai-morning-letter-HASH-leafargs-projects.vercel.app"
-  // but we need the dpl_XXX id to POST a new alias. Fall back to scraping
-  // the inspect URL instead.
-  const inspectMatch = allOut.match(/Inspect\s+(https?:\/\/vercel\.com\/[^/]+\/[^/]+\/([^/?\s]+))/);
-  const deployId = inspectMatch ? inspectMatch[2] : null;
+  // The "Inspect" URL points at the latest deployment but uses the bare ID;
+  // the Vercel API needs the `dpl_XXX`-prefixed full UID. Resolve it via the
+  // deployments list (find the deploy whose `url` matches the production line).
+  let deployId = null;
+  try {
+    const { execFileSync } = require("child_process");
+    const curlBin = process.platform === "win32" ? "curl.exe" : "curl";
+    const tok = process.env.VERCEL_TOKEN || readToken();
+    if (tok && newDeployUrl) {
+      const out = execFileSync(curlBin, [
+        "-sS", "-H", "Authorization: Bearer " + tok,
+        "https://api.vercel.com/v6/deployments?projectId=prj_wCbATzb0PNXsdjKVzHuode9jfBeI&limit=5&teamId=team_eXXOxECFjvUEbTXratuOKotI&target=production",
+      ], { encoding: "utf8" });
+      const j = JSON.parse(out);
+      const prodHost = newDeployUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+      const hit = (j.deployments || []).find((d) => (d.url || "").replace(/^https?:\/\//, "").replace(/\/$/, "") === prodHost);
+      if (hit) deployId = hit.uid;
+    }
+  } catch (_) {}
   if (deployId) {
     ensureBrandAlias(deployId, brandUrl);
   } else {
-    console.warn("[publish_site] could not find inspect URL; skipping brand-alias swap");
+    console.warn("[publish_site] could not resolve latest production deploy id; skipping brand-alias swap");
   }
 
   // 6) Parse the deploy URL(s) and emit a digest URL on the canonical alias.
