@@ -23,9 +23,11 @@ const DATE = arg("--date");
 const SITE_ROOT = path.resolve(__dirname, "..");
 const VCJS =
   "C:\\Users\\rafae\\AppData\\Roaming\\npm\\node_modules\\vercel\\dist\\vc.js";
+const SITE_URL = process.env.SITE_URL || "https://ai-morning-letter.vercel.app";
 
 const mdPath = path.join(SITE_ROOT, "d", DATE, "digest.md");
 const htmlPath = path.join(SITE_ROOT, "d", DATE, "index.html");
+const ogPath = path.join(SITE_ROOT, "d", DATE, "og.png");
 
 if (!fs.existsSync(mdPath)) {
   console.error("missing source: " + mdPath);
@@ -98,6 +100,20 @@ function extractDeployInfo(output) {
     mdPath,
     htmlPath,
   ]);
+
+  // 1b) Render OG image (1200x630 PNG for social previews). Best-effort:
+  // if Pillow isn't installed or the font is missing, log and continue.
+  try {
+    run("render_og", "python", [
+      path.join(SITE_ROOT, "scripts", "render_og.py"),
+      mdPath,
+      ogPath,
+      "--site-url",
+      SITE_URL,
+    ]);
+  } catch (e) {
+    console.warn("[publish_site] OG image render failed (continuing without): " + (e.message || e));
+  }
 
   // 2) Rebuild archive.json + today.html
   run("rebuild_archive", "node", [

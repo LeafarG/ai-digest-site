@@ -1,6 +1,7 @@
 // ai-morning-letter — front page logic
 // Loads archive.json and renders a card grid grouped by month, with
-// a search box that filters by date / kicker / headline / queries.
+// a search box (full-text over date / kicker / headline / query) and
+// kicker-chip category filters (click to toggle, multiple = AND).
 (function () {
   "use strict";
 
@@ -11,6 +12,8 @@
   if (!listEl) return;
 
   let items = [];
+  /** @type {Set<string>} */
+  const activeKickers = new Set();
 
   function escapeHtml(s) {
     return String(s)
@@ -61,13 +64,18 @@
 `;
   }
 
-  function render(filter) {
-    const f = (filter || "").trim().toLowerCase();
-    listEl.innerHTML = "";
-    let lastMonth = null;
-    let shown = 0;
+  function stripBrackets(k) {
+    if (!k) return "";
+    const m = k.match(/\[(MODEL|PRODUCT|RESEARCH|FUNDING|POLICY|SECURITY|TOOLING|OPEN-SOURCE)\]/);
+    return m ? m[1] : k;
+  }
 
-    items.forEach(function (it) {
+  function matchesItem(it, f, kickers) {
+    if (kickers.size > 0) {
+      const k = stripBrackets(it.first_kicker);
+      if (!kickers.has(k)) return false;
+    }
+    if (f) {
       const haystack = [
         it.date, it.title || "",
         it.first_kicker || "",
@@ -75,7 +83,19 @@
         it.description || "",
         String(it.n_stories || ""),
       ].join(" ").toLowerCase();
-      if (f && haystack.indexOf(f) === -1) return;
+      if (haystack.indexOf(f) === -1) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    const f = (searchEl ? searchEl.value : "").trim().toLowerCase();
+    listEl.innerHTML = "";
+    let lastMonth = null;
+    let shown = 0;
+
+    items.forEach(function (it) {
+      if (!matchesItem(it, f, activeKickers)) return;
 
       const mk = monthKey(it.date);
       if (mk !== lastMonth) {
@@ -93,22 +113,70 @@
     });
 
     if (shown === 0) {
-      listEl.innerHTML = `<p class="empty-state">No editions match that filter. Try a different word or browse by date.</p>`;
+      listEl.innerHTML = `<p class="empty-state">No editions match that filter. Try clearing a chip or a different word.</p>`;
     }
     if (countEl) {
-      countEl.textContent =
-        shown === items.length
-          ? shown + " edition" + (shown === 1 ? "" : "s")
-          : shown + " of " + items.length + " match";
+      const filterActive = f || activeKickers.size > 0;
+      countEl.textContent = filterActive
+        ? shown + " of " + items.length + " match"
+        : items.length + " edition" + (items.length === 1 ? "" : "s");
     }
-    if (totalEl && !f) totalEl.textContent = String(items.length);
+    if (totalEl && !f && activeKickers.size === 0) totalEl.textContent = String(items.length);
   }
 
-  // Returns the .archive-grid of the most recently appended .month-block.
   function block_or_last_grid() {
     const blocks = listEl.querySelectorAll(".month-block");
     if (blocks.length === 0) return null;
     return blocks[blocks.length - 1].querySelector(".archive-grid");
+  }
+
+  function paintChipCounts() {
+    const counts = {
+      MODEL: 0, PRODUCT: 0, RESEARCH: 0, FUNDING: 0,
+      POLICY: 0, SECURITY: 0, TOOLING: 0, "OPEN-SOURCE": 0,
+    };
+    items.forEach((it) => {
+      const k = stripBrackets(it.first_kicker);
+      if (counts[k] != null) counts[k]++;
+    });
+    document.querySelectorAll(".filter-chip").forEach((chip) => {
+      const k = chip.dataset.kicker;
+      const c = counts[k] || 0;
+      let span = chip.querySelector(".chip-count");
+      if (!span) {
+        span = document.createElement("span");
+        span.className = "chip-count";
+        chip.appendChild(span);
+      }
+      span.textContent = String(c);
+    });
+  }
+
+  function bindChips() {
+    document.querySelectorAll(".filter-chip").forEach((chip) => {
+      chip.addEventListener("click", function () {
+        const k = chip.dataset.kicker;
+        if (activeKickers.has(k)) activeKickers.delete(k);
+        else activeKickers.add(k);
+        chip.classList.toggle("active", activeKickers.has(k));
+        render();
+      });
+    });
+  }
+
+  function bindKeyboard() {
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "/" && document.activeElement !== searchEl) {
+        if (searchEl) {
+          e.preventDefault();
+          searchEl.focus();
+          searchEl.select();
+        }
+      }
+      if (e.key === "Escape" && document.activeElement === searchEl) {
+        searchEl.blur();
+      }
+    });
   }
 
   function load() {
@@ -119,6 +187,7 @@
       })
       .then(function (data) {
         items = Array.isArray(data) ? data : [];
+        paintChipCounts();
         render(searchEl ? searchEl.value : "");
       })
       .catch(function (err) {
@@ -129,7 +198,9 @@
   }
 
   if (searchEl) {
-    searchEl.addEventListener("input", function (e) { render(e.target.value); });
+    searchEl.addEventListener("input", function (e) { render(); });
   }
+  bindChips();
+  bindKeyboard();
   load();
 })();

@@ -318,6 +318,7 @@ def escape_html(s: str) -> str:
 def make_html(date: str, meta: dict, stories: list[dict], coming_up: list[dict], site_url: str) -> str:
     title = f"Morning Letter \u2014 {date}"
     canonical = f"{site_url.rstrip('/')}/d/{date}/"
+    og_image = f"{site_url.rstrip('/')}/d/{date}/og.png"
     date_label = format_date_long(date)
 
     title_html = f"{escape_html(date_label)}"
@@ -345,9 +346,15 @@ def make_html(date: str, meta: dict, stories: list[dict], coming_up: list[dict],
 <meta name="description" content="{escape_html(description)}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{escape_html(og_description)}">
+<meta property="og:image" content="{og_image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:type" content="article">
 <meta property="og:url" content="{canonical}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{og_image}">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{escape_html(og_description)}">
 <meta name="theme-color" content="#c2410c">
 <link rel="canonical" href="{canonical}">
 <link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23c2410c'/%3E%3Ctext x='32' y='44' font-size='38' font-family='sans-serif' fill='white' text-anchor='middle' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E">

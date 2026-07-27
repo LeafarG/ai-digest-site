@@ -294,6 +294,76 @@ code {
 /*   ARCHIVE PAGE                                                      */
 /* ================================================================== */
 
+.archive-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.archive-filters .filter-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    Roboto, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  margin-right: 0.25rem;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    Roboto, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fg-soft);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+.filter-chip:hover {
+  border-color: var(--border-strong);
+}
+.filter-chip .chip-count {
+  font-size: 0.7rem;
+  color: var(--fg-faint);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.filter-chip[data-kicker="MODEL"]        .chip-count { color: var(--cat-MODEL); }
+.filter-chip[data-kicker="PRODUCT"]      .chip-count { color: var(--cat-PRODUCT); }
+.filter-chip[data-kicker="RESEARCH"]     .chip-count { color: var(--cat-RESEARCH); }
+.filter-chip[data-kicker="FUNDING"]      .chip-count { color: var(--cat-FUNDING); }
+.filter-chip[data-kicker="POLICY"]       .chip-count { color: var(--cat-POLICY); }
+.filter-chip[data-kicker="SECURITY"]     .chip-count { color: var(--cat-SECURITY); }
+.filter-chip[data-kicker="TOOLING"]      .chip-count { color: var(--cat-TOOLING); }
+.filter-chip[data-kicker="OPEN-SOURCE"]  .chip-count { color: var(--cat-OPEN-SOURCE); }
+.filter-chip.active {
+  border-color: var(--cat-fg, var(--fg-soft));
+  background: var(--cat-bg, var(--bg-tint));
+  color: var(--cat-fg, var(--fg));
+}
+.filter-chip.active .chip-count { color: inherit; opacity: 0.7; }
+.filter-chip[data-kicker="MODEL"]       { --cat-bg: rgba(79, 70, 229, 0.10);  --cat-fg: var(--cat-MODEL); }
+.filter-chip[data-kicker="PRODUCT"]     { --cat-bg: rgba(124, 58, 237, 0.10); --cat-fg: var(--cat-PRODUCT); }
+.filter-chip[data-kicker="RESEARCH"]    { --cat-bg: rgba(5, 150, 105, 0.10);  --cat-fg: var(--cat-RESEARCH); }
+.filter-chip[data-kicker="FUNDING"]     { --cat-bg: rgba(217, 119, 6, 0.12);  --cat-fg: var(--cat-FUNDING); }
+.filter-chip[data-kicker="POLICY"]      { --cat-bg: rgba(220, 38, 38, 0.10);  --cat-fg: var(--cat-POLICY); }
+.filter-chip[data-kicker="SECURITY"]    { --cat-bg: rgba(234, 88, 12, 0.12);  --cat-fg: var(--cat-SECURITY); }
+.filter-chip[data-kicker="TOOLING"]     { --cat-bg: rgba(8, 145, 178, 0.10);  --cat-fg: var(--cat-TOOLING); }
+.filter-chip[data-kicker="OPEN-SOURCE"] { --cat-bg: rgba(13, 148, 136, 0.10); --cat-fg: var(--cat-OPEN-SOURCE); }
+.filter-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .archive-controls {
   display: flex;
   align-items: center;
