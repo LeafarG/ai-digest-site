@@ -1,7 +1,7 @@
 deploy=https://ai-morning-letter.vercel.app
 digest=https://ai-morning-letter.vercel.app/d/2026-07-27/
 date=2026-07-27
-per_deploy=https://ai-morning-letter-9hqj51y6r-leafargs-projects.vercel.app
+per_deploy=https://ai-morning-letter-lq1zvkcab-leafargs-projects.vercel.app
 alias=https://ai-digest-site-pink.vercel.app
 aliases=https://ai-digest-site-pink.vercel.app
-vercel_deploy=dpl_CdKP2kWH6GyrZGhg4yoGJC5miYMj
+vercel_deploy=dpl_AuKaPzxUThZKW8voFrq5LEUdGCU1
