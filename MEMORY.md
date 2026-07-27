@@ -34,7 +34,7 @@ Do NOT use the bare `ai-digest-site.vercel.app/` — that hostname is held by an
   - Source list as inline pills separated by middots.
 - **Coming up** callout box with prefixed "DAY YYYY-MM-DD" labels.
 - **Daily footer**: archive / latest / raw markdown links.
-- **Archive (front page)**: monthly sections, each with a 2- or 3-column responsive card grid; live search box filters by date / kicker / headline / query.
+- **Archive (front page)**: monthly sections, each with a 2- or 3-column responsive card grid; live search box filters by date / kicker / headline / query. **Kicker-chip filter row** above the search box: 8 buttons (MODEL / PRODUCT / RESEARCH / FUNDING / POLICY / SECURITY / TOOLING / OPEN-SOURCE) with live counts per chip, click to toggle, multiple active = AND. `/` keypress focuses the search box (GitHub-style), `Esc` blurs.
 - **Typography**: serif body (Iowan Old Style / Charter stack), sans-serif chrome (system-ui), wider reading column (760px), 18px base, 1.7 line-height.
 - **Dark mode**: prefers-color-scheme parity; category colors retain readability on the dark surface.
 - **Responsive**: collapses to single column under 600px.
@@ -57,9 +57,10 @@ Do NOT use the bare `ai-digest-site.vercel.app/` — that hostname is held by an
 | `d/YYYY-MM-DD/digest.md` | Raw Markdown source |
 | `static/styles.css` | Shared CSS, dark-mode-aware, category-coded kicker pills |
 | `static/app.js` | Archive loader + keyword search + monthly card grid |
-| `scripts/render_html.py` | UTF-8-clean Markdown → standalone HTML (handles both `**[KICKER]**` new format and legacy `**Headline.**` digests with heuristic kicker inference) |
+| `scripts/render_html.py` | UTF-8-clean Markdown → standalone HTML (handles both `**[KICKER]**` new format and legacy `**Headline.**` digests with heuristic kicker inference). Injects `og:image` + `twitter:image` meta pointing at the per-day `og.png`. |
+| `scripts/render_og.py` | Pillow-based 1200×630 PNG generator. Branded card: wordmark + date + kicker pill + first headline (wrapped) + N-more line + URL footer. Uses local Segoe UI / Arial with cross-platform fallbacks (Liberation / DejaVu on Linux). |
 | `scripts/rebuild_archive.js` | Emits `archive.json` + `today.html` from `d/*/digest.md` |
-| `scripts/publish_site.js` | The daily orchestrator: render → archive → commit → vercel deploy --prod → swap brand alias onto the new deploy → write `.last-deploy-url` |
+| `scripts/publish_site.js` | The daily orchestrator: render → render OG → archive → commit → `vercel deploy --prod` → swap brand alias onto the new deploy → write `.last-deploy-url` |
 | `.last-deploy-url` | Ephemeral handoff file consumed by the cron agent |
 
 ## Cron
@@ -104,6 +105,7 @@ The 19 archived digests (2026-07-08 → 2026-07-26) predate the `[KICKER]` tag c
 - Imported `projects/ai-digest/digests/*.md` (19 files, 2026-07-08 → 2026-07-26) into `d/<date>/`.
 - All rendered with the new `render_html.py` (no mojibake, new card layout, heuristic kicker).
 - Re-rendered 2026-07-27 with the new template.
+- **OG image** (`d/<date>/og.png`, 1200×630, ~40KB each) generated for all 20 archived editions. Per-day `<head>` carries `og:image` + `og:image:width` + `og:image:height` + `twitter:image`. Social previews now render as branded cards in Telegram / Slack / Twitter.
 
 ## Verifications
 
