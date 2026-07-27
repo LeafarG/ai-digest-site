@@ -211,28 +211,43 @@ function ensureBrandAlias(newDeployId, brandUrl) {
   }
   const teamId = "team_eXXOxECFjvUEbTXratuOKotI";
   const projectId = "prj_wCbATzb0PNXsdjKVzHuode9jfBeI";
-  const headers = { Authorization: "Bearer " + token };
+  const aliasBase = brandUrl.replace(/^https?:\/\//, "");
 
-  const listUrl = `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=15&teamId=${teamId}`;
+  const { execFileSync } = require("child_process");
+  // On Windows, PowerShell exposes `curl` as an alias for Invoke-WebRequest.
+  // We MUST spawn the real curl.exe and pass JSON safely.
+  const curlBin = process.platform === "win32" ? "curl.exe" : "curl";
+
+  function curl(method, url, extraHeaders, body) {
+    const args = [
+      "-sS",
+      "-X", method,
+      "-H", "Authorization: Bearer " + token,
+    ];
+    if (extraHeaders) for (const h of extraHeaders) args.push("-H", h);
+    if (body != null) args.push("--data-raw", body);
+    args.push(url);
+    const out = execFileSync(curlBin, args, { encoding: "utf8" });
+    return out;
+  }
+
+  // 2) Find old deploys with the brand alias and remove it.
   let deployments = [];
   try {
-    const res = JSON.parse(require("child_process").execFileSync("curl", ["-sS", "-H", "Authorization: Bearer " + token, listUrl], { encoding: "utf8" }));
+    const res = JSON.parse(curl("GET", `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=15&teamId=${teamId}`));
     deployments = res.deployments || [];
   } catch (e) {
     console.warn("[publish_site] could not list deployments: " + (e.message || e));
     return;
   }
-
-  const aliasBase = brandUrl.replace(/^https?:\/\//, "");
-  // 2) Find old deploys with the brand alias and remove it.
   for (const d of deployments) {
     if (d.uid === newDeployId) continue;
     try {
-      const aRes = JSON.parse(require("child_process").execFileSync("curl", ["-sS", "-H", "Authorization: Bearer " + token, `https://api.vercel.com/v1/deployments/${d.uid}/aliases?teamId=${teamId}`], { encoding: "utf8" }));
+      const aRes = JSON.parse(curl("GET", `https://api.vercel.com/v1/deployments/${d.uid}/aliases?teamId=${teamId}`));
       for (const a of (aRes.aliases || [])) {
         if (a.alias === aliasBase) {
           console.log("[publish_site] removing stale brand alias from " + d.uid.slice(4, 16) + "...");
-          try { require("child_process").execFileSync("curl", ["-sS", "-X", "DELETE", "-H", "Authorization: Bearer " + token, `https://api.vercel.com/v2/aliases/${a.uid}`], { encoding: "utf8" }); } catch (_) {}
+          try { curl("DELETE", `https://api.vercel.com/v2/aliases/${a.uid}`); } catch (_) {}
         }
       }
     } catch (_) {}
@@ -242,14 +257,15 @@ function ensureBrandAlias(newDeployId, brandUrl) {
   try {
     console.log("[publish_site] attaching " + aliasBase + " to " + newDeployId.slice(4, 16) + "...");
     const body = JSON.stringify({ alias: aliasBase });
-    const r = require("child_process").execFileSync("curl", [
-      "-sS", "-X", "POST",
-      "-H", "Authorization: Bearer " + token,
-      "-H", "Content-Type: application/json",
-      "-d", body,
-      `https://api.vercel.com/v2/deployments/${newDeployId}/aliases`
-    ], { encoding: "utf8" });
-    if (r && r.status !== "ERROR") {
+    const r = curl(
+      "POST",
+      `https://api.vercel.com/v2/deployments/${newDeployId}/aliases`,
+      ["Content-Type: application/json"],
+      body
+    );
+    let parsed;
+    try { parsed = JSON.parse(r); } catch (_) { parsed = { raw: r }; }
+    if (parsed.status === "SUCCESS" || parsed.alias) {
       console.log("  brand alias attached");
     } else {
       console.warn("  brand alias POST returned: " + r);
