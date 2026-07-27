@@ -1,10 +1,43 @@
+# Python
 __pycache__/
-*.swp
-.DS_Store
-.env
-.env.*
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Node
 node_modules/
 
+# Build / cache
+.cache/
+dist/
+.next/
+.turbo/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Env / secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+credentials/
+
+# Vercel
 .vercel
+
+# Local script artefacts
 publish.log
 .trigger.txt
