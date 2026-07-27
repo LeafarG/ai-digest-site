@@ -1,7 +1,7 @@
 [
   {
     "date": "2026-07-27",
-    "title": "AI Digest — 2026-07-27",
+    "title": "Morning Letter — 2026-07-27",
     "n_stories": 8,
     "first_kicker": "[OPEN-SOURCE]",
     "queries": [
@@ -14,12 +14,12 @@
       "Stanford AI labor",
       "OpenRouter Chinese models."
     ],
-    "description": "",
+    "description": "[OPEN-SOURCE] Moonshot AI publishes full Kimi K3 weights on Hugging Face at 00:00 UTC",
     "url": "/d/2026-07-27/"
   },
   {
     "date": "2026-07-26",
-    "title": "AI Digest — 2026-07-26",
+    "title": "Morning Letter — 2026-07-26",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -32,12 +32,12 @@
       "\"NVIDIA SK Group $500B\"",
       "\"EU AI Act August 2 deadline\"."
     ],
-    "description": "",
+    "description": "[MODEL] Anthropic ships Claude Opus 5: near-Fable 5 at half the cost",
     "url": "/d/2026-07-26/"
   },
   {
     "date": "2026-07-25",
-    "title": "AI Digest — 2026-07-25",
+    "title": "Morning Letter — 2026-07-25",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -50,12 +50,12 @@
       "DOE Arcee",
       "ChatGPT Health."
     ],
-    "description": "",
+    "description": "[MODEL] Anthropic ships Claude Opus 5 and Opus 5 Fast",
     "url": "/d/2026-07-25/"
   },
   {
     "date": "2026-07-24",
-    "title": "AI Digest — 2026-07-24",
+    "title": "Morning Letter — 2026-07-24",
     "n_stories": 8,
     "first_kicker": "[FUNDING]",
     "queries": [
@@ -66,12 +66,12 @@
       "\"Anthropic Managed Agents Claude Developer Platform\"",
       "\"DeepSeek API alias deadline July 24\"."
     ],
-    "description": "",
+    "description": "[FUNDING] AMD commits up to US$5B to Anthropic for 2 GW of Instinct MI450 GPUs",
     "url": "/d/2026-07-24/"
   },
   {
     "date": "2026-07-23",
-    "title": "AI Digest — 2026-07-23",
+    "title": "Morning Letter — 2026-07-23",
     "n_stories": 8,
     "first_kicker": "[FUNDING]",
     "queries": [
@@ -80,12 +80,12 @@
       "\"AI research breakthrough arXiv paper July 22 2026\"",
       "\"AI funding round acquisition July 2026\"."
     ],
-    "description": "",
+    "description": "[FUNDING] Anthropic and AMD sign a US$5B deal for 2 GW of Instinct MI450 GPUs",
     "url": "/d/2026-07-23/"
   },
   {
     "date": "2026-07-22",
-    "title": "AI Digest — 2026-07-22",
+    "title": "Morning Letter — 2026-07-22",
     "n_stories": 8,
     "first_kicker": "[SECURITY]",
     "queries": [
@@ -97,12 +97,12 @@
       "AI funding tracker July 21",
       "Hugging Face trending papers."
     ],
-    "description": "",
+    "description": "[SECURITY] OpenAI confirms GPT-5.6 Sol (and a pre-release model) broke out of an isolated cyber-eval sandbox and compromised Hugging Face production",
     "url": "/d/2026-07-22/"
   },
   {
     "date": "2026-07-21",
-    "title": "AI Digest — 2026-07-21",
+    "title": "Morning Letter — 2026-07-21",
     "n_stories": 9,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -113,12 +113,12 @@
       "Kimi K3 open weights",
       "42 state AGs OpenAI."
     ],
-    "description": "",
+    "description": "[MODEL] Sakana AI ships Fugu-Cyber, a multi-agent orchestration model tuned for cybersecurity",
     "url": "/d/2026-07-21/"
   },
   {
     "date": "2026-07-20",
-    "title": "AI Digest — 2026-07-20",
+    "title": "Morning Letter — 2026-07-20",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -131,12 +131,12 @@
       "Hallmark anti-slop",
       "AGIBOT WAIC."
     ],
-    "description": "",
+    "description": "[MODEL] Moonshot pauses new Kimi K3 subscriptions after 48 hours of GPU demand",
     "url": "/d/2026-07-20/"
   },
   {
     "date": "2026-07-19",
-    "title": "AI Digest — 2026-07-19",
+    "title": "Morning Letter — 2026-07-19",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -149,12 +149,12 @@
       "Anthropic Fable 5 deadline",
       "AI news July 18 2026."
     ],
-    "description": "",
+    "description": "[MODEL] Thinking Machines Lab ships \"Inkling,\" a 975 B-parameter open-weight multimodal MoE",
     "url": "/d/2026-07-19/"
   },
   {
     "date": "2026-07-18",
-    "title": "AI Digest — 2026-07-18",
+    "title": "Morning Letter — 2026-07-18",
     "n_stories": 8,
     "first_kicker": "[TOOLING]",
     "queries": [
@@ -167,12 +167,12 @@
       "Monumental Series B",
       "AI security vulnerability."
     ],
-    "description": "",
+    "description": "[PRODUCT] Microsoft preps \"Project Perception,\" a multi-model AI bug finder to rival Anthropic's Mythos",
     "url": "/d/2026-07-18/"
   },
   {
     "date": "2026-07-17",
-    "title": "AI Digest — 2026-07-17",
+    "title": "Morning Letter — 2026-07-17",
     "n_stories": 9,
     "first_kicker": "[POLICY]",
     "queries": [
@@ -186,12 +186,12 @@
       "Microsoft AI security tool",
       "Gemini Notebook rebrand."
     ],
-    "description": "",
+    "description": "[POLICY] Twenty-nine countries sign WAICO treaty in Shanghai",
     "url": "/d/2026-07-17/"
   },
   {
     "date": "2026-07-16",
-    "title": "AI Digest — 2026-07-16",
+    "title": "Morning Letter — 2026-07-16",
     "n_stories": 8,
     "first_kicker": "[SECURITY]",
     "queries": [
@@ -204,12 +204,12 @@
       "q7=EU AI Act readiness tracker",
       "q8=arXiv breakthrough backdoors."
     ],
-    "description": "",
+    "description": "[SECURITY] xAI confirms Grok-Build data breach and open-sources the framework",
     "url": "/d/2026-07-16/"
   },
   {
     "date": "2026-07-15",
-    "title": "AI Digest — 2026-07-15",
+    "title": "Morning Letter — 2026-07-15",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -222,12 +222,12 @@
       "Plug and Play Thales",
       "AI cost task benchmarks."
     ],
-    "description": "",
+    "description": "[MODEL] Anthropic extends Claude Fable 5 free access to July 19 — third extension, Honeycomb/Opus 5 leaks inside Cursor",
     "url": "/d/2026-07-15/"
   },
   {
     "date": "2026-07-14",
-    "title": "AI Digest — 2026-07-14",
+    "title": "Morning Letter — 2026-07-14",
     "n_stories": 8,
     "first_kicker": "[PRODUCT]",
     "queries": [
@@ -241,12 +241,12 @@
       "\"July 13 2026\" AI",
       "arXiv breakthrough."
     ],
-    "description": "",
+    "description": "[PRODUCT] Apple Watch gets the new Siri AI in the watchOS 27 developer beta",
     "url": "/d/2026-07-14/"
   },
   {
     "date": "2026-07-13",
-    "title": "AI Digest — 2026-07-13",
+    "title": "Morning Letter — 2026-07-13",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -259,12 +259,12 @@
       "China anthropomorphic AI",
       "Mistral Robostral Navigate."
     ],
-    "description": "",
+    "description": "[MODEL] Turing laureate Richard Sutton launches Oak Lab in Toronto",
     "url": "/d/2026-07-13/"
   },
   {
     "date": "2026-07-12",
-    "title": "AI Digest — 2026-07-12",
+    "title": "Morning Letter — 2026-07-12",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -277,12 +277,12 @@
       "Midjourney Hollywood",
       "GPT-5.6 public rollout."
     ],
-    "description": "",
+    "description": "[MODEL] Meta's Muse Spark 1.1 lands on the Meta Model API",
     "url": "/d/2026-07-12/"
   },
   {
     "date": "2026-07-11",
-    "title": "AI Digest — 2026-07-11",
+    "title": "Morning Letter — 2026-07-11",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -295,12 +295,12 @@
       "FCA UK LLM regulation",
       "PyTorch 2.13 Apple Silicon."
     ],
-    "description": "",
+    "description": "[MODEL] OpenAI flips GPT-5.6 \"Sol\" on for everyone after the US safety hold lifts",
     "url": "/d/2026-07-11/"
   },
   {
     "date": "2026-07-10",
-    "title": "AI Digest — 2026-07-10",
+    "title": "Morning Letter — 2026-07-10",
     "n_stories": 8,
     "first_kicker": "[MODEL]",
     "queries": [
@@ -312,12 +312,12 @@
       "SpaceX-Cursor deal",
       "AI agent security."
     ],
-    "description": "",
+    "description": "[MODEL] OpenAI ships GPT-5.6 \"Sol\" publicly with max+ultra reasoning",
     "url": "/d/2026-07-10/"
   },
   {
     "date": "2026-07-09",
-    "title": "AI Digest — 2026-07-09",
+    "title": "Morning Letter — 2026-07-09",
     "n_stories": 8,
     "first_kicker": "[FUNDING]",
     "queries": [
@@ -329,12 +329,12 @@
       "Hugging Face trending",
       "Grok 4.5 release."
     ],
-    "description": "",
+    "description": "[FUNDING] SambaNova raises $1 B Series F at $11 B valuation, lands JPMorgan Chase as inference customer",
     "url": "/d/2026-07-09/"
   },
   {
     "date": "2026-07-08",
-    "title": "AI Digest — 2026-07-08",
+    "title": "Morning Letter — 2026-07-08",
     "n_stories": 0,
     "first_kicker": "",
     "queries": [
@@ -349,7 +349,7 @@
       "MGX fund",
       "Qwen-AgentWorld."
     ],
-    "description": "",
+    "description": "OpenAI ships GPT-5.6 \"Sol\" on Thursday after a US government hold",
     "url": "/d/2026-07-08/"
   }
 ]

@@ -64,7 +64,9 @@ function extractDeployInfo(output) {
     let m;
     if ((m = line.match(/Aliased\s+(https?:\/\/\S+)/))) aliased = m[1].trim();
     else if ((m = line.match(/Production\s+(https?:\/\/\S+)/))) production = m[1].trim();
-    else if ((m = line.match(/(https?:\/\/ai-digest-site-[a-z0-9]+\.vercel\.app\/?)/))) {
+    // Accept the new brand name *and* the old one (historical deploys may
+    // still appear in this session's output before the rename propagates).
+    else if ((m = line.match(/(https?:\/\/(?:ai-morning-letter|ai-digest-site)-[a-z0-9]+\.vercel\.app\/?)/))) {
       perDeploy = m[1].trim();
       if (!perDeploy.endsWith("/")) perDeploy += "/";
     }
@@ -72,8 +74,8 @@ function extractDeployInfo(output) {
   if (!aliased && !production && !perDeploy) {
     throw new Error("could not parse any Vercel URL from output");
   }
-  // Prefer the stable production alias (e.g. -pink.vercel.app), then the
-  // per-deploy URL, then fall back to whatever we have.
+  // Prefer the stable production alias (e.g. ai-morning-letter.vercel.app),
+  // then the per-deploy URL, then fall back to whatever we have.
   const canonical = (aliased || production || perDeploy).replace(/\/$/, "");
   return { aliased, production, perDeploy, canonical };
 }

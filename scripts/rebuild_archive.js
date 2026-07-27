@@ -26,19 +26,27 @@ function extractFirstKicker(text) {
   return m ? "[" + m[1] + "]" : "";
 }
 
-function extractStories(text) {
-  return (text.match(/^\s*-\s+\*\*\[(MODEL|PRODUCT|RESEARCH|FUNDING|POLICY|SECURITY|TOOLING|OPEN-SOURCE)\]/gm) || []).length;
-}
-
 function extractTitle(text, date) {
-  const m = text.match(/^#\s+AI Digest\s+\u2014\s+\d{4}-\d{2}-\d{2}.*$/m);
-  if (m) return m[0].replace(/^#\s+/, "").trim();
-  return `AI Digest \u2014 ${date}`;
+  // Brand is always "Morning Letter" regardless of what's in the source H1
+  // (which still uses the legacy "# AI Digest — DATE" form for backwards
+  // compatibility with already-published editions).
+  return `Morning Letter \u2014 ${date}`;
 }
 
 function extractDescription(text) {
-  const m = text.match(/^\s*-\s+\*\*\[[^\]]+\]\s+\*\*([^\n.]+)/m);
-  return m ? m[1].trim().slice(0, 160) : "";
+  // Use the first story's kicker + headline as the card description.
+  // New format: - **[KICKER] Headline.**
+  // Legacy format: - **Headline.**  (no kicker)
+  const m = text.match(/^\s*-\s+\*\*\[?(MODEL|PRODUCT|RESEARCH|FUNDING|POLICY|SECURITY|TOOLING|OPEN-SOURCE)?\]?\s*(.+?)\.\*\*\s*/m);
+  if (!m) return "";
+  const kicker = m[1];
+  const headline = m[2].trim();
+  if (kicker) return `[${kicker}] ${headline}`.slice(0, 180);
+  return headline.slice(0, 180);
+}
+
+function extractStories(text) {
+  return (text.match(/^\s*-\s+\*\*\[(MODEL|PRODUCT|RESEARCH|FUNDING|POLICY|SECURITY|TOOLING|OPEN-SOURCE)\]/gm) || []).length;
 }
 
 function listDates() {
@@ -80,13 +88,13 @@ function main() {
 <head>
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="0; url=/d/${latest}/">
-<title>Latest AI Digest \u2014 ${latest}</title>
-<meta property="og:title" content="Latest AI Digest \u2014 ${latest}">
-<meta property="og:url" content="https://ai-digest-site.vercel.app/d/${latest}/">
+<title>Latest Morning Letter \u2014 ${latest}</title>
+<meta property="og:title" content="Latest Morning Letter \u2014 ${latest}">
+<meta property="og:url" content="https://ai-morning-letter.vercel.app/d/${latest}/">
 <link rel="canonical" href="/d/${latest}/">
 </head>
 <body>
-<p>Redirecting to <a href="/d/${latest}/">today's digest (${latest})</a>\u2026</p>
+<p>Redirecting to <a href="/d/${latest}/">today's Morning Letter (${latest})</a>\u2026</p>
 </body>
 </html>
 `;
