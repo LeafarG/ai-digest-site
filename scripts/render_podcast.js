@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// render_podcast.js — generate a Joe Rogan-style narration audio for a digest.
+// render_podcast.js - generate a Joe Rogan-style narration audio for a digest.
 //
 // Usage:  node scripts/render_podcast.js --date 2026-07-29
 //
@@ -12,13 +12,14 @@
 //   6) Drop the MP3 at d/<DATE>/podcast.mp3
 //
 // Graceful failure:
-//   - Voxtral server down → tries to start it (cold start 2–5 min)
+//   - Voxtral server down → tries to start it (cold start 2-5 min)
 //   - Cold start times out (5 min) → log warning, exit 0 (no audio, no error)
 //   - Render failure → log warning, exit 1 (publish_site.js continues without audio)
 //
 // The Joe Rogan transformation is deterministic (no LLM call) so the daily
 // output is reproducible.  Variety comes from rotating intros/outros keyed
-// off the index of each story.
+// off the index of each story.  Voice: casual_female (the only Voxtral
+// voice validated for English on this build host).
 
 const fs = require("fs");
 const path = require("path");
@@ -123,7 +124,7 @@ function ensureVoxtral() {
 
 const STORY_RE = /^- \*\*\[([A-Z-]+)\]\s+(.+?)\.\*\*\s*([\s\S]*?)(?=^- \*\*|^##\s+Coming|^---|\Z)/gm;
 const COMING_UP_HEAD_RE = /^##\s+Coming up/m;
-const COMING_UP_ITEM_RE = /^- \*\*([^*]+)\*\*\s*[—\-]\s*(.+)$/gm;
+const COMING_UP_ITEM_RE = /^- \*\*([^*]+)\*\*\s*[-\-]\s*(.+)$/gm;
 const SOURCE_LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 
 function parseDigest(md) {
@@ -151,16 +152,16 @@ function parseDigest(md) {
 // ---------- Joe Rogan transformation ------------------------------------
 
 const STORY_INTROS = [
-  "First up — and this is a big one —",
-  "Okay, so —",
-  "All right, so —",
-  "Listen —",
-  "Right, so —",
-  "Dude —",
-  "Check this out —",
-  "Okay so —",
-  "And this one's wild —",
-  "Here we go —",
+  "First up - and this is a big one -",
+  "Okay, so -",
+  "All right, so -",
+  "Listen -",
+  "Right, so -",
+  "Dude -",
+  "Check this out -",
+  "Okay so -",
+  "And this one's wild -",
+  "Here we go -",
 ];
 
 const KICKER_INTROS = {
@@ -199,7 +200,7 @@ function stripKickerPrefix(headline) {
 function buildNarration(stories, comingUp, dateLabel) {
   const lines = [];
   lines.push(
-    `What's up, my friends. It's ${dateLabel}. Oh man, oh man, oh man. We have got a wild AI Morning Letter to get into today. ${stories.length} stories. All heavy hitters. So let's just dive right in, okay? Like, if you thought AI was moving fast before — bro. Today is gonna make your head spin. Let's go.`
+    `What's up, my friends. It's ${dateLabel}. Oh man, oh man, oh man. We have got a wild AI Morning Letter to get into today. ${stories.length} stories. All heavy hitters. So let's just dive right in, okay? Like, if you thought AI was moving fast before - bro. Today is gonna make your head spin. Let's go.`
   );
 
   stories.forEach((s, i) => {
@@ -211,7 +212,7 @@ function buildNarration(stories, comingUp, dateLabel) {
   });
 
   if (comingUp.length) {
-    const cu = comingUp.map((it) => `${it.when} — ${it.text}`).join(". Next up: ");
+    const cu = comingUp.map((it) => `${it.when} - ${it.text}`).join(". Next up: ");
     lines.push(`Coming up in the next forty-eight hours. ${cu}. Let the drama begin.`);
   } else {
     lines.push(`That's the letter. We'll see you tomorrow with what's coming up.`);
@@ -259,35 +260,40 @@ function renderChunks(narration) {
   const chunks = chunkNarration(narration, 1300);
   console.log(`[render_podcast] ${chunks.length} chunks, total ${narration.length} chars`);
 
-  // Stage chunks in WSL tmp dir.
+  // Stage chunks in a Windows-side staging dir under d/<DATE>/.podcast_chunks/
+  // and read them from WSL via /mnt/d/. This avoids heredoc / shell-quoting
+  // bugs that broke the original `cat > ... << EOF` approach.
+  const stagingDir = path.join(SITE_ROOT, "d", DATE, ".podcast_chunks");
+  fs.mkdirSync(stagingDir, { recursive: true });
+  // Wipe any previous run.
+  for (const f of fs.readdirSync(stagingDir)) {
+    try { fs.unlinkSync(path.join(stagingDir, f)); } catch (_) {}
+  }
   wslBash(`mkdir -p ${WSL_TMP} && rm -f ${WSL_TMP}/*.wav ${WSL_TMP}/*.txt ${WSL_TMP}/${WSL_FILENAME}`);
 
+  const wslStaging = `/mnt/d/.openclaw/workspace/projects/ai-digest-site/d/${DATE}/.podcast_chunks`;
   const chunkFiles = [];
   for (let i = 0; i < chunks.length; i++) {
     const idx = i + 1;
     const txt = chunks[i];
-    const txtPath = `${WSL_TMP}/chunk_${idx}.txt`;
-    const wavPath = `${WSL_TMP}/chunk_${idx}.wav`;
-
-    // Write chunk text to WSL tmp via heredoc (avoids quoting issues).
-    const escaped = txt.replace(/'/g, "'\\''");
-    wslBash(`cat > '${txtPath}' << 'PODCAST_EOF'\n${txt}\nPODCAST_EOF`);
+    const stagingTxt = path.join(stagingDir, `chunk_${idx}.txt`);
+    const stagingWav = path.join(stagingDir, `chunk_${idx}.wav`);
+    fs.writeFileSync(stagingTxt, txt, "utf8");
     console.log(`[render_podcast] chunk ${idx}/${chunks.length} (${txt.length} chars)`);
 
-    // Render via tts.sh.
+    // Render via tts.sh reading from the WSL-visible staging dir.
     const r = wslBashStatus(
-      `bash ${VOXTRAL_TTS_SCRIPT} '${txtPath}' '${wavPath}' casual_female English`,
+      `bash ${VOXTRAL_TTS_SCRIPT} '${wslStaging}/chunk_${idx}.txt' '${wslStaging}/chunk_${idx}.wav' casual_female English`,
       8 * 60 * 1000  // 8-min safety cap per chunk
     );
     if (r.status !== 0) {
       throw new Error(`chunk ${idx} failed (exit ${r.status}): ${(r.stderr || r.stdout || "").slice(-400)}`);
     }
-    // Check the file actually appeared.
-    const ls = wslBash(`ls -la '${wavPath}'`);
-    if (!ls || !ls.includes(".wav")) {
-      throw new Error(`chunk ${idx} produced no WAV (tts.sh output: ${(r.stdout || "").slice(-400)})`);
+    // Check the file actually appeared on the Windows side.
+    if (!fs.existsSync(stagingWav) || fs.statSync(stagingWav).size < 1000) {
+      throw new Error(`chunk ${idx} produced no WAV (or too small) at ${stagingWav}`);
     }
-    chunkFiles.push(wavPath);
+    chunkFiles.push(`${wslStaging}/chunk_${idx}.wav`);
   }
   return chunkFiles;
 }
