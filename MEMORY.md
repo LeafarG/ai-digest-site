@@ -1,4 +1,4 @@
-# ai-morning-letter — MEMORY
+﻿# ai-morning-letter — MEMORY
 
 A Vercel-hosted static site that hosts the daily English AI world digest as an "AI Morning Letter" — one editorialised page per day. Rebuilt (visual + brand rename) on 2026-07-27 from the original `ai-digest-site`. Replaces the previous PDF-pushed Telegram delivery with a permanent, searchable, Git-backed surface that updates every morning via cron → git commit → `vercel deploy --prod` → brand-alias swap → auto-alias.
 
@@ -141,3 +141,19 @@ The 19 archived digests (2026-07-08 → 2026-07-26) predate the `[KICKER]` tag c
 - Tags / kicker-based browsing beyond the single keyword search box.
 - Replacing the legacy `projects/ai-digest/digests/` tree (kept for historical reference, no longer auto-generated).
 - Removing `ai-digest-site-pink.vercel.app` legacy alias from project production auto-aliases (requires a one-time Vercel dashboard step or a manual `delete alias` for each prod deploy; kept in place to avoid breaking any active bookmarks).
+
+## Podcast audio (added 2026-07-29)
+
+- Each daily edition gets a Joe Rogan-style narration rendered via the local Voxtral TTS (WSL Ubuntu, port 8091, voice casual_female).
+- Script generation is **deterministic** (no LLM call): rotating intros keyed off story index, kicker-specific lead-ins, rotating outros, full coming-up section. See scripts/render_podcast.js (uildNarration).
+- Pipeline per chunk: stage text in d/<DATE>/.podcast_chunks/chunk_N.txt (Windows side, WSL-readable via /mnt/d/), call wsl -d Ubuntu -- bash -lc "bash /mnt/d/.openclaw/workspace/skills/voxtral-tts/scripts/tts.sh ...", ffmpeg concat + libmp3lame 96 kbps mono → d/<DATE>/podcast.mp3.
+- Idempotency check at the top of ender_podcast.js: if podcast.mp3 already exists and mtime ≥ digest.md mtime, the script exits 0 with a one-line skip log.
+- Graceful degradation in publish_site.js: the audio step is wrapped in try/catch. Failure to render audio does NOT fail the deploy — the per-day page just ships without the <audio> element.
+- HTML embed: ender_html.py computes _estimate_audio_duration(size_bytes) (96 kbps × bytes) and emits <section class="podcast-card">…<audio controls preload="metadata" src="podcast.mp3">…</section> between the day-header and the stories. CSS for .podcast-card in static/styles.css (orange brand kicker, full-width player, dark-mode parity).
+- Archive cards (static/app.js): when it.has_audio is true in rchive.json, the card shows a "🎧 Listen" badge in the top row. CSS in .archive-card .card-audio.
+- Repo storage: MP3s co-located in git (d/<DATE>/podcast.mp3). At ~5 MB/day, ~1.8 GB/year — within GitHub's 5 GB soft limit for ~2.5 years. If we cross that, migrate to Vercel Blob. **Audio is in the commit, not a separate upload** — git push origin main will pull the new files; but ercel deploy --prod is the primary daily deploy and does NOT depend on the push.
+- Build artefacts gitignored: d/*/.podcast_chunks/ (intermediate chunks), d/*/podcast_script.txt (debug).
+
+## Daily pipeline (post-2026-07-29)
+
+Step 4 (publish script) now includes the audio render as the first sub-step (best-effort). On-disk layout is unchanged otherwise. The audio render adds ~5–8 min wall-time per day when Voxtral is warm; if Voxtral is down, the script tries to start it (cold start 2–5 min) and falls back to text-only after a 5-min timeout.
