@@ -69,6 +69,11 @@ const VOXTRAL_TTS_SCRIPT = "/mnt/d/.openclaw/workspace/skills/voxtral-tts/script
 const WSL_TMP = `/tmp/podcast_${DATE}`;
 const WSL_FILENAME = `podcast.mp3`;
 
+// Per-chunk loudness target (LUFS). Apple Podcasts / Spotify recommend
+// -16 LUFS for spoken-word; Voxtral's TTS output lands around -36 to -38
+// LUFS, so this normalises each chunk to that range.
+const TARGET_LUFS = -16;
+
 function wslBash(cmd) {
   // Run a single command inside the Ubuntu WSL distro and return stdout.
   const args = ["-d", WSL_DISTRO, "--", "bash", "-lc", cmd];
@@ -526,7 +531,22 @@ function renderChunks(narration) {
     if (!fs.existsSync(stagingWav) || fs.statSync(stagingWav).size < 1000) {
       throw new Error(`chunk ${idx} produced no WAV (or too small) at ${stagingWav}`);
     }
-    chunkFiles.push(`${wslStaging}/chunk_${idx}.wav`);
+    // Loudness normalize each chunk so the 2-host mix (Joe casual_male +
+    // Guest neutral_male) doesn't have jarring volume jumps between
+    // speakers or content types. Voxtral outputs land around -36 to -38
+    // LUFS; single-pass linear loudnorm to TARGET_LUFS brings them all
+    // to the same level (~ -17 LUFS given Voxtral's range).
+    const normWav = `${wslStaging}/chunk_${idx}.norm.wav`;
+    const normCmd = `ffmpeg -y -i '${stagingWav}' -af loudnorm=I=${TARGET_LUFS}:TP=-1.5:LRA=11:linear=true -ac 1 '${normWav}' >/dev/null 2>&1 && echo OK || echo FAIL`;
+    const normResult = wslBash(normCmd).trim();
+    if (normResult !== "OK") {
+      // Don't fail the whole render — fall back to the raw WAV. Loudness
+      // will be uneven but at least the audio plays.
+      console.warn(`[render_podcast] chunk ${idx} loudnorm failed (${normResult}); using raw WAV`);
+      chunkFiles.push(stagingWav);
+    } else {
+      chunkFiles.push(normWav);
+    }
   }
   return chunkFiles;
 }
