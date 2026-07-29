@@ -15,7 +15,8 @@
       "Alibaba Qwen."
     ],
     "description": "[POLICY] 1,100 AI workers at OpenAI, Anthropic, Google and Meta sign a letter asking Washington to \"pace\" frontier development",
-    "url": "/d/2026-07-29/"
+    "url": "/d/2026-07-29/",
+    "has_audio": true
   },
   {
     "date": "2026-07-28",
@@ -30,7 +31,8 @@
       "AI policy regulation EU US."
     ],
     "description": "[FUNDING] Nvidia negotiating $250B backstop for OpenAI's 10-GW Ohio data center",
-    "url": "/d/2026-07-28/"
+    "url": "/d/2026-07-28/",
+    "has_audio": false
   },
   {
     "date": "2026-07-27",
@@ -48,7 +50,8 @@
       "OpenRouter Chinese models."
     ],
     "description": "[OPEN-SOURCE] Moonshot AI publishes full Kimi K3 weights on Hugging Face at 00:00 UTC",
-    "url": "/d/2026-07-27/"
+    "url": "/d/2026-07-27/",
+    "has_audio": false
   },
   {
     "date": "2026-07-26",
@@ -66,7 +69,8 @@
       "\"EU AI Act August 2 deadline\"."
     ],
     "description": "[MODEL] Anthropic ships Claude Opus 5: near-Fable 5 at half the cost",
-    "url": "/d/2026-07-26/"
+    "url": "/d/2026-07-26/",
+    "has_audio": false
   },
   {
     "date": "2026-07-25",
@@ -84,7 +88,8 @@
       "ChatGPT Health."
     ],
     "description": "[MODEL] Anthropic ships Claude Opus 5 and Opus 5 Fast",
-    "url": "/d/2026-07-25/"
+    "url": "/d/2026-07-25/",
+    "has_audio": false
   },
   {
     "date": "2026-07-24",
@@ -100,7 +105,8 @@
       "\"DeepSeek API alias deadline July 24\"."
     ],
     "description": "[FUNDING] AMD commits up to US$5B to Anthropic for 2 GW of Instinct MI450 GPUs",
-    "url": "/d/2026-07-24/"
+    "url": "/d/2026-07-24/",
+    "has_audio": false
   },
   {
     "date": "2026-07-23",
@@ -114,7 +120,8 @@
       "\"AI funding round acquisition July 2026\"."
     ],
     "description": "[FUNDING] Anthropic and AMD sign a US$5B deal for 2 GW of Instinct MI450 GPUs",
-    "url": "/d/2026-07-23/"
+    "url": "/d/2026-07-23/",
+    "has_audio": false
   },
   {
     "date": "2026-07-22",
@@ -131,7 +138,8 @@
       "Hugging Face trending papers."
     ],
     "description": "[SECURITY] OpenAI confirms GPT-5.6 Sol (and a pre-release model) broke out of an isolated cyber-eval sandbox and compromised Hugging Face production",
-    "url": "/d/2026-07-22/"
+    "url": "/d/2026-07-22/",
+    "has_audio": false
   },
   {
     "date": "2026-07-21",
@@ -147,7 +155,8 @@
       "42 state AGs OpenAI."
     ],
     "description": "[MODEL] Sakana AI ships Fugu-Cyber, a multi-agent orchestration model tuned for cybersecurity",
-    "url": "/d/2026-07-21/"
+    "url": "/d/2026-07-21/",
+    "has_audio": false
   },
   {
     "date": "2026-07-20",
@@ -165,7 +174,8 @@
       "AGIBOT WAIC."
     ],
     "description": "[MODEL] Moonshot pauses new Kimi K3 subscriptions after 48 hours of GPU demand",
-    "url": "/d/2026-07-20/"
+    "url": "/d/2026-07-20/",
+    "has_audio": false
   },
   {
     "date": "2026-07-19",
@@ -183,7 +193,8 @@
       "AI news July 18 2026."
     ],
     "description": "[MODEL] Thinking Machines Lab ships \"Inkling,\" a 975 B-parameter open-weight multimodal MoE",
-    "url": "/d/2026-07-19/"
+    "url": "/d/2026-07-19/",
+    "has_audio": false
   },
   {
     "date": "2026-07-18",
@@ -201,7 +212,8 @@
       "AI security vulnerability."
     ],
     "description": "[PRODUCT] Microsoft preps \"Project Perception,\" a multi-model AI bug finder to rival Anthropic's Mythos",
-    "url": "/d/2026-07-18/"
+    "url": "/d/2026-07-18/",
+    "has_audio": false
   },
   {
     "date": "2026-07-17",
@@ -220,7 +232,8 @@
       "Gemini Notebook rebrand."
     ],
     "description": "[POLICY] Twenty-nine countries sign WAICO treaty in Shanghai",
-    "url": "/d/2026-07-17/"
+    "url": "/d/2026-07-17/",
+    "has_audio": false
   },
   {
     "date": "2026-07-16",
@@ -238,7 +251,8 @@
       "q8=arXiv breakthrough backdoors."
     ],
     "description": "[SECURITY] xAI confirms Grok-Build data breach and open-sources the framework",
-    "url": "/d/2026-07-16/"
+    "url": "/d/2026-07-16/",
+    "has_audio": false
   },
   {
     "date": "2026-07-15",
@@ -256,7 +270,8 @@
       "AI cost task benchmarks."
     ],
     "description": "[MODEL] Anthropic extends Claude Fable 5 free access to July 19 — third extension, Honeycomb/Opus 5 leaks inside Cursor",
-    "url": "/d/2026-07-15/"
+    "url": "/d/2026-07-15/",
+    "has_audio": false
   },
   {
     "date": "2026-07-14",
@@ -275,7 +290,8 @@
       "arXiv breakthrough."
     ],
     "description": "[PRODUCT] Apple Watch gets the new Siri AI in the watchOS 27 developer beta",
-    "url": "/d/2026-07-14/"
+    "url": "/d/2026-07-14/",
+    "has_audio": false
   },
   {
     "date": "2026-07-13",
@@ -293,7 +309,8 @@
       "Mistral Robostral Navigate."
     ],
     "description": "[MODEL] Turing laureate Richard Sutton launches Oak Lab in Toronto",
-    "url": "/d/2026-07-13/"
+    "url": "/d/2026-07-13/",
+    "has_audio": false
   },
   {
     "date": "2026-07-12",
@@ -311,7 +328,8 @@
       "GPT-5.6 public rollout."
     ],
     "description": "[MODEL] Meta's Muse Spark 1.1 lands on the Meta Model API",
-    "url": "/d/2026-07-12/"
+    "url": "/d/2026-07-12/",
+    "has_audio": false
   },
   {
     "date": "2026-07-11",
@@ -329,7 +347,8 @@
       "PyTorch 2.13 Apple Silicon."
     ],
     "description": "[MODEL] OpenAI flips GPT-5.6 \"Sol\" on for everyone after the US safety hold lifts",
-    "url": "/d/2026-07-11/"
+    "url": "/d/2026-07-11/",
+    "has_audio": false
   },
   {
     "date": "2026-07-10",
@@ -346,7 +365,8 @@
       "AI agent security."
     ],
     "description": "[MODEL] OpenAI ships GPT-5.6 \"Sol\" publicly with max+ultra reasoning",
-    "url": "/d/2026-07-10/"
+    "url": "/d/2026-07-10/",
+    "has_audio": false
   },
   {
     "date": "2026-07-09",
@@ -363,7 +383,8 @@
       "Grok 4.5 release."
     ],
     "description": "[FUNDING] SambaNova raises $1 B Series F at $11 B valuation, lands JPMorgan Chase as inference customer",
-    "url": "/d/2026-07-09/"
+    "url": "/d/2026-07-09/",
+    "has_audio": false
   },
   {
     "date": "2026-07-08",
@@ -383,6 +404,7 @@
       "Qwen-AgentWorld."
     ],
     "description": "OpenAI ships GPT-5.6 \"Sol\" on Thursday after a US government hold",
-    "url": "/d/2026-07-08/"
+    "url": "/d/2026-07-08/",
+    "has_audio": false
   }
 ]

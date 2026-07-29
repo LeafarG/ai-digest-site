@@ -68,6 +68,10 @@ function main() {
     if (!fs.existsSync(mdPath)) continue;
     const text = fs.readFileSync(mdPath, "utf8");
     const headerDate = extractDateFromHeader(text) || date;
+    // Audio availability: true when d/<DATE>/podcast.mp3 exists alongside
+    // the digest. The archive card surfaces a "🎧 Listen" badge for those.
+    const mp3Path = path.join(DIGESTS, date, "podcast.mp3");
+    const has_audio = fs.existsSync(mp3Path);
     items.push({
       date: headerDate,
       title: extractTitle(text, headerDate),
@@ -76,6 +80,7 @@ function main() {
       queries: extractQueries(text),
       description: extractDescription(text),
       url: `/d/${headerDate}/`,
+      has_audio,
     });
   }
   fs.writeFileSync(OUT, JSON.stringify(items, null, 2) + "\n", "utf8");

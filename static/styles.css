@@ -484,6 +484,28 @@ code {
   font-size: 0.78rem;
   color: var(--fg-muted);
 }
+.archive-card .card-audio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    Roboto, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+  background: rgba(194, 65, 12, 0.08);
+  border: 1px solid rgba(194, 65, 12, 0.18);
+  border-radius: 999px;
+  padding: 0.15em 0.55em;
+  margin-left: auto;
+}
+@media (prefers-color-scheme: dark) {
+  .archive-card .card-audio {
+    background: rgba(251, 146, 60, 0.10);
+    border-color: rgba(251, 146, 60, 0.22);
+  }
+}
 .archive-card .card-title {
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
     Roboto, sans-serif;

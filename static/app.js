@@ -51,11 +51,15 @@
     const stories = it.n_stories || 0;
     const titleAttr = escapeHtml(it.title || ("Morning Letter — " + it.date));
     const desc = escapeHtml(it.description || "");
+    const audioBadge = it.has_audio
+      ? '<span class="card-audio" title="Audio edition available">🎧 Listen</span>'
+      : "";
     return `
 <article class="archive-card">
   <div class="card-top">
     <span class="card-date">${dateLabel}</span>
     <span class="card-stories">${stories} stor${stories === 1 ? "y" : "ies"}</span>
+    ${audioBadge}
   </div>
   <a class="card-title" href="${escapeHtml(it.url)}">${titleAttr}</a>
   ${desc ? `<p class="card-desc">${desc}</p>` : ""}
