@@ -154,79 +154,170 @@ function parseDigest(md) {
   return { stories, comingUp };
 }
 
+// ---------- TTS pre-processor ------------------------------------------
+
+// Goal: hand Voxtral text that reads naturally. The big wins:
+//
+//   * Hyphens → spaces (otherwise TTS reads "minus")
+//   * Em-dashes / en-dashes → commas (otherwise silent gaps)
+//   * Curly/straight quotes stripped (otherwise "quote ... end quote")
+//   * Markdown bold/link syntax stripped
+//   * Dates as words ("July 29, 2026" not "2026-07-29")
+//   * "US$ 1 B" → "one billion US dollars" (currency expanded)
+//   * "10%" → "ten percent", "3.7×" → "three point seven times"
+//   * "1,100" → "1100" (no comma-pause from TTS)
+//   * "230M" / "8 K" → "two hundred thirty million" / "eight thousand"
+//   * Decimal points read as "point"
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function tts(text) {
+  let out = text;
+
+  // 1) Dates first (so hyphens in YYYY-MM-DD don't get touched below).
+  out = out.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (_m, y, mo, d) =>
+    `${MONTHS[parseInt(mo, 10) - 1]} ${parseInt(d, 10)}, ${y}`);
+
+  // 2) Em-dash / en-dash → comma (natural pause).
+  out = out.replace(/[—–]/g, ", ");
+
+  // 3) Double-hyphen → comma.
+  out = out.replace(/--/g, ", ");
+
+  // 4) Hyphen with whitespace on BOTH sides (clause separator) → comma.
+  out = out.replace(/\s+-\s+/g, ", ");
+
+  // 5) Hyphen between a letter and a digit (e.g., "AES-7" → "AES 7").
+  out = out.replace(/([A-Za-z])-(\d)/g, "$1 $2");
+
+  // 6) Markdown bold + italics + links.
+  out = out.replace(/\*\*([^*]+)\*\*/g, "$1");
+  out = out.replace(/\*([^*]+)\*/g, "$1");
+  out = out.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+
+  // 7) Currency. "US$ 1 B" / "US$ 250 B" / "US$ 600 M" / "US$ 100 K".
+  out = out.replace(/US\$\s*(\d+(?:\.\d+)?)\s*B(?:illion)?\b/gi, "$1 billion US dollars");
+  out = out.replace(/US\$\s*(\d+(?:\.\d+)?)\s*M(?:illion)?\b/gi, "$1 million US dollars");
+  out = out.replace(/US\$\s*(\d+(?:\.\d+)?)\s*K(?:,000)?\b/gi, "$1 thousand US dollars");
+  out = out.replace(/US\$\s*(\d+(?:\.\d+)?)/g, "$1 US dollars");
+  out = out.replace(/\$\s*(\d+(?:\.\d+)?)\s*B\b/g, "$1 billion dollars");
+  out = out.replace(/\$\s*(\d+(?:\.\d+)?)\s*M\b/g, "$1 million dollars");
+  out = out.replace(/\$\s*(\d+(?:\.\d+)?)\s*K\b/g, "$1 thousand dollars");
+
+  // 8) Approx values.
+  out = out.replace(/~(\d+(?:\.\d+)?)/g, "about $1");
+
+  // 9) Percent / multiplier.
+  out = out.replace(/(\d+(?:\.\d+)?)\s*%/g, "$1 percent");
+  out = out.replace(/(\d+(?:\.\d+)?)\s*×/g, "$1 times");
+
+  // 10) M-token / K-token patterns.
+  out = out.replace(/(\d+)\s*M[\s-]*token/gi, "$1 million token");
+  out = out.replace(/(\d+)\s*K[\s-]*token/gi, "$1 thousand token");
+
+  // 11) Thousands-comma numbers (avoid TTS comma-pause).
+  out = out.replace(/(\d),(\d{3})\b/g, "$1$2");
+
+  // 12) Decimals → "point".
+  out = out.replace(/(\d+)\.(\d+)/g, "$1 point $2");
+
+  // 13) Energy / data units.
+  out = out.replace(/(\d+(?:\.\d+)?)\s*GW\b/gi, "$1 gigawatt");
+  out = out.replace(/(\d+(?:\.\d+)?)\s*MW\b/gi, "$1 megawatt");
+  out = out.replace(/(\d+(?:\.\d+)?)\s*TB\b/gi, "$1 terabytes");
+  out = out.replace(/(\d+(?:\.\d+)?)\s*GB\b/gi, "$1 gigabytes");
+
+  // 13b) Compact / spaced unit suffixes. "230M" / "8 K" → spelled out.
+  out = out.replace(/(\d+(?:\.\d+)?)\s*M\b/g, "$1 million");
+  out = out.replace(/(\d+(?:\.\d+)?)\s*K\b/g, "$1 thousand");
+  out = out.replace(/(\d+(?:\.\d+)?)\s*B\b/g, "$1 billion");
+
+  // 14) Time tokens.
+  out = out.replace(/(\d+(?:\.\d+)?)\s*hours?\b/gi, "$1 hours");
+
+  // 15) Strip ALL quote marks (TTS reads "quote ... end quote" markers).
+  out = out.replace(/[""'']/g, "");
+
+  // 16) Convert any remaining hyphens to spaces (final safety net so TTS
+  //     never reads "minus"). Compounds like "co-founders" → "co founders"
+  //     and "non-human" → "non human" both sound natural.
+  out = out.replace(/-/g, " ");
+
+  // 17) Cleanup: duplicate commas + whitespace.
+  out = out.replace(/\s+,/g, ",");
+  out = out.replace(/,{2,}/g, ",");
+  out = out.replace(/\s+\./g, ".");
+  out = out.replace(/\s+/g, " ");
+  out = out.trim();
+
+  return out;
+}
+
 // ---------- Joe Rogan transformation ------------------------------------
 
-const STORY_INTROS = [
-  "First up - and this is a big one -",
-  "Okay, so -",
-  "All right, so -",
-  "Listen -",
-  "Right, so -",
-  "Dude -",
-  "Check this out -",
-  "Okay so -",
-  "And this one's wild -",
-  "Here we go -",
+const REACTIONS = [
+  "Okay, this one's wild.",
+  "Listen, this matters.",
+  "Big one here.",
+  "Here's the deal.",
+  "So here's what happened.",
+  "You need to know about this.",
+  "This is significant.",
+  "Okay, look.",
+  "Right, so.",
+  "Check this out.",
 ];
 
 const KICKER_INTROS = {
-  POLICY: ["Big policy move.", "Okay, policy alert.", "Listen, this is a big policy thing.", "Policy news.", "Big government story."],
-  FUNDING: ["Funding alert.", "Big money move.", "Okay, this is money.", "Money news.", "M&A alert."],
-  SECURITY: ["Big security move.", "Security stuff.", "Okay, this is wild, security.", "Cyber news.", "Security alert."],
-  MODEL: ["Okay, model news.", "Big model release.", "New model alert.", "Model drop.", "Frontier-model stuff."],
-  PRODUCT: ["Product news.", "Okay, product launch.", "Product drop.", "New product alert.", "Product update."],
-  RESEARCH: ["Research paper news.", "Okay, research.", "Paper drop.", "Research alert.", "New paper."],
-  TOOLING: ["Tooling news.", "Okay, dev tools.", "Dev tooling drop.", "Tools alert.", "New tooling."],
-  "OPEN-SOURCE": ["Open-source news.", "OSS alert.", "Open-source drop.", "OSS news.", "New open weights."],
+  POLICY: ["Big policy move.", "Policy alert.", "Government angle.", "Big government story."],
+  FUNDING: ["Funding alert.", "Money move.", "M and A news.", "Big money story."],
+  SECURITY: ["Security story.", "Big security move.", "Cyber news.", "Security alert."],
+  MODEL: ["Model drop.", "Big model release.", "New model alert.", "Frontier model stuff."],
+  PRODUCT: ["Product launch.", "New product.", "Product update.", "Product news."],
+  RESEARCH: ["Research paper.", "New study.", "Paper drop."],
+  TOOLING: ["Developer tools.", "Dev tooling drop.", "Tools alert."],
+  "OPEN-SOURCE": ["Open source release.", "Open weights news.", "OSS alert."],
 };
 
-const STORY_OUTROS = [
-  "That's wild.",
-  "I mean, come on.",
-  "That's a big deal.",
-  "Crazy.",
-  "That's the move.",
-  "And that's where we are.",
-  "Wild.",
-  "That's nuts.",
+const WHY_MATTERS = [
   "Big deal.",
+  "Watch this one.",
+  "That's the story.",
+  "That's where we are.",
+  "Keep your eye on this.",
   "That's how fast this is moving.",
+  "That matters.",
+  "Okay, next.",
 ];
 
-function pick(arr, i) {
-  return arr[i % arr.length];
-}
+const INTROS = [
+  (d, n) => `What's up my friends. It's ${d}. ${n} stories, all heavy hitters, plus your upcoming calendar. Let's get into it.`,
+  (d, n) => `Hey, welcome back. It's ${d}, and today's Morning Letter is stacked. ${n} stories for you. Let's dive in.`,
+  (d, n) => `Good morning. It's ${d}. Big day in AI. ${n} stories. Let's go.`,
+];
 
-function stripKickerPrefix(headline) {
-  // The headlines already start with the news, no prefix needed.
-  return headline.replace(/^["']|["']$/g, "").trim();
-}
+const OUTROS = [
+  (d, n) => `That's the AI Morning Letter for ${d}. ${n} stories, one wild morning. If you enjoyed this, share it with someone. The more people who understand what's happening, the better. We'll see you tomorrow. Peace.`,
+];
+
+function pick(arr, i) { return arr[i % arr.length]; }
 
 function buildNarration(stories, comingUp, dateLabel) {
   const lines = [];
-  lines.push(
-    `What's up, my friends. It's ${dateLabel}. Oh man, oh man, oh man. We have got a wild AI Morning Letter to get into today. ${stories.length} stories. All heavy hitters. So let's just dive right in, okay? Like, if you thought AI was moving fast before - bro. Today is gonna make your head spin. Let's go.`
-  );
-
+  lines.push(tts(pick(INTROS, 0)(dateLabel, stories.length)));
   stories.forEach((s, i) => {
-    const intro = pick(STORY_INTROS, i);
+    const reaction = pick(REACTIONS, i);
     const kickerIntro = pick(KICKER_INTROS[s.kicker] || KICKER_INTROS.MODEL, i);
-    const outro = pick(STORY_OUTROS, i);
-    const h = stripKickerPrefix(s.headline);
-    lines.push(`${intro} ${kickerIntro} ${h}. ${s.body} ${outro}`);
+    const why = pick(WHY_MATTERS, i + 3);
+    const beat = `${reaction} ${kickerIntro} ${s.headline}. ${s.body} ${why}`;
+    lines.push(tts(beat));
   });
-
   if (comingUp.length) {
-    const cu = comingUp.map((it) => `${it.when} - ${it.text}`).join(". Next up: ");
-    lines.push(`Coming up in the next forty-eight hours. ${cu}. Let the drama begin.`);
+    const cu = comingUp.map((it) => `${it.when}, ${it.text}`).join(". Then ");
+    lines.push(tts(`Coming up in the next forty eight hours. ${cu}. Big week ahead.`));
   } else {
-    lines.push(`That's the letter. We'll see you tomorrow with what's coming up.`);
+    lines.push(tts("That's the letter for today. We'll see you tomorrow."));
   }
-
-  lines.push(
-    `All right. That's the letter. ${stories.length} stories. One wild morning. I'm telling you, the AI world is moving fast right now. And if you enjoyed this, share it with someone. The more people who understand what's happening, the better. We'll see you tomorrow. Peace.`
-  );
-
+  lines.push(tts(pick(OUTROS, 0)(dateLabel, stories.length)));
   return lines.join("\n\n");
 }
 
