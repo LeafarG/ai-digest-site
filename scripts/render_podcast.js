@@ -569,22 +569,71 @@ function copyToSite(wslMp3Path) {
   }
   console.log(`[render_podcast] parsed ${stories.length} stories, ${comingUp.length} coming-up items`);
 
-  // Build narration (2-host by default; fall back to single-voice if
-  // PODCAST_SINGLE_VOICE=1 is set).
+  // Build narration. Order of preference:
+  //   1. LLM-generated script (write_podcast_script.js) — natural dialog
+  //   2. Deterministic 2-host generator (buildSegments) — fallback
+  // Set PODCAST_FORCE_DETERMINISTIC=1 to skip the LLM call.
   const dateLabel = (() => {
     const [y, m, d] = DATE.split("-");
     const dt = new Date(Date.UTC(+y, +m - 1, +d));
     return dt.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
   })();
   const singleVoice = process.env.PODCAST_SINGLE_VOICE === "1";
-  const narration = singleVoice
-    ? buildSegments(stories, comingUp, dateLabel)
-        .map((s) => s.text)
-        .join("\n\n")
-    : buildSegments(stories, comingUp, dateLabel);
+  const forceDet = process.env.PODCAST_FORCE_DETERMINISTIC === "1";
 
-  // Save narration for debugging / re-use.
-  const scriptText = Array.isArray(narration) ? narration.map((s) => `[${s.speaker}] ${s.text}`).join("\n\n") : narration;
+  const jsonPath = path.join(SITE_ROOT, "d", DATE, "podcast_script.json");
+  let narration;
+  let usedLLM = false;
+
+  if (!forceDet && !singleVoice && fs.existsSync(jsonPath)) {
+    // Reuse cached LLM script if newer than the digest.
+    const jsonMtime = fs.statSync(jsonPath).mtimeMs;
+    const mdMtime = fs.statSync(mdPath).mtimeMs;
+    if (jsonMtime >= mdMtime) {
+      try {
+        const cached = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+        if (Array.isArray(cached) && cached.length > 0 && cached[0].speaker) {
+          narration = cached;
+          usedLLM = true;
+          console.log(`[render_podcast] reusing cached LLM script (${cached.length} segments)`);
+        }
+      } catch (_) { /* fall through */ }
+    }
+  }
+
+  if (!usedLLM && !forceDet && !singleVoice) {
+    // Run the LLM pass via write_podcast_script.js (separate process so
+    // its mmx dependency is isolated).
+    console.log("[render_podcast] invoking LLM (M3) to write script...");
+    try {
+      execFileSync("node", [
+        path.join(SITE_ROOT, "scripts", "write_podcast_script.js"),
+        "--date", DATE,
+      ], { encoding: "utf8", timeout: 5 * 60 * 1000, stdio: ["ignore", "inherit", "inherit"] });
+      const cached = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+      if (Array.isArray(cached) && cached.length > 0) {
+        narration = cached;
+        usedLLM = true;
+      }
+    } catch (e) {
+      console.warn(`[render_podcast] LLM script generation failed; falling back to deterministic. ${(e.stderr || e.message || "").toString().slice(-200)}`);
+    }
+  }
+
+  if (!usedLLM) {
+    // Deterministic fallback. buildSegments returns [{speaker, text}] —
+    // for single-voice we just join the texts.
+    const segs = buildSegments(stories, comingUp, dateLabel);
+    narration = singleVoice ? segs.map((s) => s.text).join("\n\n") : segs;
+    console.log(`[render_podcast] using deterministic generator (${segs.length} segments)`);
+  } else {
+    console.log(`[render_podcast] using LLM-generated script (${narration.length} segments)`);
+  }
+
+  // Save the script for debugging / re-use (LLM-tagged if from M3).
+  const scriptText = Array.isArray(narration)
+    ? narration.map((s) => `[${s.speaker.toUpperCase()}] ${s.text}`).join("\n\n")
+    : narration;
   const scriptPath = path.join(SITE_ROOT, "d", DATE, "podcast_script.txt");
   fs.writeFileSync(scriptPath, scriptText, "utf8");
   console.log(`[render_podcast] script saved -> ${scriptPath}`);
