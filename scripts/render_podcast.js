@@ -501,10 +501,10 @@ function renderChunks(narration) {
   // bugs that broke the original `cat > ... << EOF` approach.
   const stagingDir = path.join(SITE_ROOT, "d", DATE, ".podcast_chunks");
   fs.mkdirSync(stagingDir, { recursive: true });
-  // Wipe any previous run.
-  for (const f of fs.readdirSync(stagingDir)) {
-    try { fs.unlinkSync(path.join(stagingDir, f)); } catch (_) {}
-  }
+  // Don't wipe the staging dir — the per-chunk idempotency check below
+  // skips chunks that already have a valid .norm.wav, so wiping would
+  // destroy the cache and force a full re-render. tts.sh and ffmpeg both
+  // overwrite their target files anyway.
   wslBash(`mkdir -p ${WSL_TMP} && rm -f ${WSL_TMP}/*.wav ${WSL_TMP}/*.txt ${WSL_TMP}/${WSL_FILENAME}`);
 
   const wslStaging = `/mnt/d/.openclaw/workspace/projects/ai-digest-site/d/${DATE}/.podcast_chunks`;
@@ -516,6 +516,25 @@ function renderChunks(narration) {
     const speaker = chunks[i].speaker || "joe";
     const stagingTxt = path.join(stagingDir, `chunk_${idx}.txt`);
     const stagingWav = path.join(stagingDir, `chunk_${idx}.wav`);
+
+    // Idempotency: if the normalised WAV already exists (and is non-trivial),
+    // skip the whole TTS + loudnorm cycle. Lets a crashed render resume
+    // without re-paying TTS costs.
+    //
+    // NOTE: must use the Windows-side path (path.join, backslashes) for
+    // fs.existsSync. The /mnt/d/... path is only visible to WSL processes,
+    // not to Node on the Windows host — fs.existsSync('/mnt/d/...') always
+    // returns false even when the file is right there.
+    const wslStagingWav = `${wslStaging}/chunk_${idx}.wav`;
+    const normWav = `${wslStaging}/chunk_${idx}.norm.wav`;
+    const normWavWin = path.join(stagingDir, `chunk_${idx}.norm.wav`);
+    const normExists = fs.existsSync(normWavWin) && fs.statSync(normWavWin).size > 1000;
+    if (normExists) {
+      console.log(`[render_podcast] chunk ${idx}/${chunks.length} already done (cached, ${fs.statSync(normWavWin).size} bytes)`);
+      chunkFiles.push(normWav);
+      continue;
+    }
+
     fs.writeFileSync(stagingTxt, txt, "utf8");
     console.log(`[render_podcast] chunk ${idx}/${chunks.length} (${txt.length} chars, voice=${voice}, speaker=${speaker})`);
 
@@ -536,14 +555,20 @@ function renderChunks(narration) {
     // speakers or content types. Voxtral outputs land around -36 to -38
     // LUFS; single-pass linear loudnorm to TARGET_LUFS brings them all
     // to the same level (~ -17 LUFS given Voxtral's range).
-    const normWav = `${wslStaging}/chunk_${idx}.norm.wav`;
-    const normCmd = `ffmpeg -y -i '${stagingWav}' -af loudnorm=I=${TARGET_LUFS}:TP=-1.5:LRA=11:linear=true -ac 1 '${normWav}' >/dev/null 2>&1 && echo OK || echo FAIL`;
+    //
+    // Use the WSL-native path (wslStaging) for ffmpeg's input/output —
+    // path.join on Windows produces backslashes (D:\...) which ffmpeg
+    // inside WSL can't read. Log files live in WSL /tmp to avoid the
+    // same path-format trap.
+
+    const normLog = `/tmp/podcast_norm_${DATE}_${idx}.log`;
+    const normCmd = `(ffmpeg -y -i '${wslStagingWav}' -af loudnorm=I=${TARGET_LUFS}:TP=-1.5:LRA=11:linear=true -ac 1 '${normWav}' >'${normLog}' 2>&1 && echo OK || (echo FAIL; tail -20 '${normLog}' >&2))`;
     const normResult = wslBash(normCmd).trim();
     if (normResult !== "OK") {
       // Don't fail the whole render — fall back to the raw WAV. Loudness
       // will be uneven but at least the audio plays.
       console.warn(`[render_podcast] chunk ${idx} loudnorm failed (${normResult}); using raw WAV`);
-      chunkFiles.push(stagingWav);
+      chunkFiles.push(wslStagingWav);
     } else {
       chunkFiles.push(normWav);
     }
