@@ -41,3 +41,7 @@ credentials/
 # Local script artefacts
 publish.log
 .trigger.txt
+
+# Podcast build artefacts (re-created by render_podcast.js each run)
+d/*/.podcast_chunks/
+d/*/podcast_script.txt
