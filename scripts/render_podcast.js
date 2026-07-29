@@ -301,36 +301,160 @@ const OUTROS = [
 
 function pick(arr, i) { return arr[i % arr.length]; }
 
-function buildNarration(stories, comingUp, dateLabel) {
-  const lines = [];
-  lines.push(tts(pick(INTROS, 0)(dateLabel, stories.length)));
+// ---------- 2-host JRE dialog -------------------------------------------
+
+// Two voices alternate: Joe (host, energetic) opens each story with the
+// framing + headline, then Guest (analyst, measured) walks through the
+// substance of the body, then Joe closes with a quick reaction. Voices are
+// dispatched per chunk by speaker tag.
+const VOICE_BY_SPEAKER = {
+  joe: "casual_male",
+  guest: "neutral_male",
+};
+
+// Phrase banks for each speaker.
+const JOE_FOLLOWUPS = [
+  "Big deal.",
+  "Watch this one.",
+  "That's the story.",
+  "That's where we are.",
+  "Keep your eye on this.",
+  "That matters.",
+  "Okay, next.",
+  "Right.",
+  "Got it.",
+];
+
+const GUEST_OPENERS = [
+  "Right, so look,",
+  "Okay, so what's happening here,",
+  "Let me explain.",
+  "So here's the deal.",
+  "Here's the read.",
+  "Right,",
+];
+
+const GUEST_CLOSERS = [
+  "That's the substance.",
+  "So that's where it stands.",
+  "And that's why it matters.",
+  "Bottom line.",
+  "That's the key.",
+];
+
+const JOE_INTROS = [
+  (d, n) => `What's up my friends. It's ${d}. ${n} stories, all heavy hitters, plus your upcoming calendar. Let's get into it.`,
+  (d, n) => `Hey, welcome back. It's ${d}, and today's Morning Letter is stacked. ${n} stories for you. Let's dive in.`,
+  (d, n) => `Good morning. It's ${d}. Big day in AI. ${n} stories. Let's go.`,
+];
+
+const JOE_OUTROS = [
+  (d, n) => `That's the AI Morning Letter for ${d}. ${n} stories, one wild morning. If you enjoyed this, share it with someone. The more people who understand what's happening, the better. We'll see you tomorrow. Peace.`,
+];
+
+function buildSegments(stories, comingUp, dateLabel) {
+  const segments = [];
+
+  // Joe intro.
+  segments.push({ speaker: "joe", text: tts(pick(JOE_INTROS, 0)(dateLabel, stories.length)) });
+
+  // Each story: Joe framing → Guest body → Joe reaction.
   stories.forEach((s, i) => {
     const reaction = pick(REACTIONS, i);
     const kickerIntro = pick(KICKER_INTROS[s.kicker] || KICKER_INTROS.MODEL, i);
-    const why = pick(WHY_MATTERS, i + 3);
-    const beat = `${reaction} ${kickerIntro} ${s.headline}. ${s.body} ${why}`;
-    lines.push(tts(beat));
+
+    // Joe: opener + kicker intro + headline.
+    segments.push({
+      speaker: "joe",
+      text: tts(`${reaction} ${kickerIntro} ${s.headline}.`),
+    });
+
+    // Guest: opener + body + closer.
+    const gOpen = pick(GUEST_OPENERS, i);
+    const gClose = pick(GUEST_CLOSERS, i + 2);
+    segments.push({
+      speaker: "guest",
+      text: tts(`${gOpen} ${s.body} ${gClose}`),
+    });
+
+    // Joe: brief reaction / why-it-matters.
+    segments.push({
+      speaker: "joe",
+      text: tts(pick(JOE_FOLLOWUPS, i + 3)),
+    });
   });
+
+  // Coming up.
   if (comingUp.length) {
+    segments.push({
+      speaker: "joe",
+      text: tts("Coming up in the next forty eight hours."),
+    });
     const cu = comingUp.map((it) => `${it.when}, ${it.text}`).join(". Then ");
-    lines.push(tts(`Coming up in the next forty eight hours. ${cu}. Big week ahead.`));
+    segments.push({
+      speaker: "guest",
+      text: tts(`${cu}. Big week ahead.`),
+    });
   } else {
-    lines.push(tts("That's the letter for today. We'll see you tomorrow."));
+    segments.push({
+      speaker: "joe",
+      text: tts("That's the letter for today. We'll see you tomorrow."),
+    });
   }
-  lines.push(tts(pick(OUTROS, 0)(dateLabel, stories.length)));
-  return lines.join("\n\n");
+
+  // Joe outro.
+  segments.push({
+    speaker: "joe",
+    text: tts(pick(JOE_OUTROS, 0)(dateLabel, stories.length)),
+  });
+
+  return segments;
 }
 
 // ---------- chunking -----------------------------------------------------
 
-// Split narration at paragraph + sentence boundaries, max ~1300 chars per chunk.
+// Group consecutive same-speaker segments together, then split any oversized
+// segment at sentence boundaries. Returns [{speaker, voice, text}, ...].
+function flattenSegments(segments, maxChars = 1200) {
+  const grouped = [];
+  let buf = "";
+  let bufSpeaker = null;
+  for (const seg of segments) {
+    if (bufSpeaker === seg.speaker && (buf.length + seg.text.length + 2) <= maxChars) {
+      buf += " " + seg.text;
+    } else {
+      if (buf) grouped.push({ speaker: bufSpeaker, voice: VOICE_BY_SPEAKER[bufSpeaker], text: buf.trim() });
+      buf = seg.text;
+      bufSpeaker = seg.speaker;
+    }
+  }
+  if (buf) grouped.push({ speaker: bufSpeaker, voice: VOICE_BY_SPEAKER[bufSpeaker], text: buf.trim() });
+
+  // Split any chunk that's still too long at sentence boundaries (preserving speaker).
+  const chunks = [];
+  for (const g of grouped) {
+    if (g.text.length <= maxChars) { chunks.push(g); continue; }
+    const sentences = g.text.match(/[^.!?]+[.!?]+(?:\s+|$)/g) || [g.text];
+    let subBuf = "";
+    for (const s of sentences) {
+      if (subBuf && (subBuf.length + s.length + 1) > maxChars) {
+        chunks.push({ speaker: g.speaker, voice: g.voice, text: subBuf.trim() });
+        subBuf = "";
+      }
+      subBuf = (subBuf + " " + s).trim();
+    }
+    if (subBuf) chunks.push({ speaker: g.speaker, voice: g.voice, text: subBuf.trim() });
+  }
+  return chunks;
+}
+
+// Legacy chunker — kept for backward compat with the single-voice path.
 function chunkNarration(text, maxChars = 1300) {
   const paragraphs = text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
   const chunks = [];
   let buf = "";
   for (const p of paragraphs) {
     if (p.length > maxChars) {
-      // Split a long paragraph at sentence boundaries.
       const sentences = p.match(/[^.!?]+[.!?]+(?:\s+|$)/g) || [p];
       for (const s of sentences) {
         if (buf && buf.length + s.length + 1 > maxChars) {
@@ -353,8 +477,19 @@ function chunkNarration(text, maxChars = 1300) {
 // ---------- TTS rendering ------------------------------------------------
 
 function renderChunks(narration) {
-  const chunks = chunkNarration(narration, 1300);
-  console.log(`[render_podcast] ${chunks.length} chunks, total ${narration.length} chars`);
+  // Two-host mode: narration is an array of {speaker, text} segments from
+  // buildSegments(). Single-voice (legacy): narration is a plain string.
+  const isTwoHost = Array.isArray(narration);
+  const chunks = isTwoHost
+    ? flattenSegments(narration, 1200)
+    : chunkNarration(narration, 1300).map((text) => ({
+        text,
+        voice: process.env.PODCAST_VOICE || "casual_male",
+        speaker: "joe",
+      }));
+
+  const totalChars = chunks.reduce((a, c) => a + c.text.length, 0);
+  console.log(`[render_podcast] ${chunks.length} chunks, total ${totalChars} chars (${isTwoHost ? "2-host" : "single-voice"})`);
 
   // Stage chunks in a Windows-side staging dir under d/<DATE>/.podcast_chunks/
   // and read them from WSL via /mnt/d/. This avoids heredoc / shell-quoting
@@ -371,14 +506,15 @@ function renderChunks(narration) {
   const chunkFiles = [];
   for (let i = 0; i < chunks.length; i++) {
     const idx = i + 1;
-    const txt = chunks[i];
+    const txt = chunks[i].text;
+    const voice = chunks[i].voice || process.env.PODCAST_VOICE || "casual_male";
+    const speaker = chunks[i].speaker || "joe";
     const stagingTxt = path.join(stagingDir, `chunk_${idx}.txt`);
     const stagingWav = path.join(stagingDir, `chunk_${idx}.wav`);
     fs.writeFileSync(stagingTxt, txt, "utf8");
-    console.log(`[render_podcast] chunk ${idx}/${chunks.length} (${txt.length} chars)`);
+    console.log(`[render_podcast] chunk ${idx}/${chunks.length} (${txt.length} chars, voice=${voice}, speaker=${speaker})`);
 
     // Render via tts.sh reading from the WSL-visible staging dir.
-    const voice = process.env.PODCAST_VOICE || "casual_male";
     const r = wslBashStatus(
       `bash ${VOXTRAL_TTS_SCRIPT} '${wslStaging}/chunk_${idx}.txt' '${wslStaging}/chunk_${idx}.wav' ${voice} English`,
       8 * 60 * 1000  // 8-min safety cap per chunk
@@ -433,17 +569,24 @@ function copyToSite(wslMp3Path) {
   }
   console.log(`[render_podcast] parsed ${stories.length} stories, ${comingUp.length} coming-up items`);
 
-  // Build narration.
+  // Build narration (2-host by default; fall back to single-voice if
+  // PODCAST_SINGLE_VOICE=1 is set).
   const dateLabel = (() => {
     const [y, m, d] = DATE.split("-");
     const dt = new Date(Date.UTC(+y, +m - 1, +d));
     return dt.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
   })();
-  const narration = buildNarration(stories, comingUp, dateLabel);
+  const singleVoice = process.env.PODCAST_SINGLE_VOICE === "1";
+  const narration = singleVoice
+    ? buildSegments(stories, comingUp, dateLabel)
+        .map((s) => s.text)
+        .join("\n\n")
+    : buildSegments(stories, comingUp, dateLabel);
 
   // Save narration for debugging / re-use.
+  const scriptText = Array.isArray(narration) ? narration.map((s) => `[${s.speaker}] ${s.text}`).join("\n\n") : narration;
   const scriptPath = path.join(SITE_ROOT, "d", DATE, "podcast_script.txt");
-  fs.writeFileSync(scriptPath, narration, "utf8");
+  fs.writeFileSync(scriptPath, scriptText, "utf8");
   console.log(`[render_podcast] script saved -> ${scriptPath}`);
 
   // Ensure Voxtral is up.
