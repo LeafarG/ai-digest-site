@@ -287,8 +287,9 @@ function renderChunks(narration) {
     console.log(`[render_podcast] chunk ${idx}/${chunks.length} (${txt.length} chars)`);
 
     // Render via tts.sh reading from the WSL-visible staging dir.
+    const voice = process.env.PODCAST_VOICE || "casual_male";
     const r = wslBashStatus(
-      `bash ${VOXTRAL_TTS_SCRIPT} '${wslStaging}/chunk_${idx}.txt' '${wslStaging}/chunk_${idx}.wav' casual_female English`,
+      `bash ${VOXTRAL_TTS_SCRIPT} '${wslStaging}/chunk_${idx}.txt' '${wslStaging}/chunk_${idx}.wav' ${voice} English`,
       8 * 60 * 1000  // 8-min safety cap per chunk
     );
     if (r.status !== 0) {
