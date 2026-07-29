@@ -248,6 +248,20 @@ def _short_date(d: str) -> str:
         return d
 
 
+def _estimate_audio_duration(size_bytes: int, bitrate_kbps: int = 96) -> str:
+    """Approximate the audio duration from the MP3 file size.
+
+    Voxtral renders at 24 kHz mono; the encoded MP3 is 96 kbps. We use that
+    as the basis so the label matches what the user will actually hear.
+    The real duration is also embedded in the MP3 header but parsing it
+    requires mutagen / ffprobe, so we approximate from size alone."""
+    if size_bytes <= 0:
+        return "?"
+    seconds = (size_bytes * 8) / (bitrate_kbps * 1000)
+    m, s = divmod(int(seconds + 0.5), 60)
+    return f"{m}:{s:02d}"
+
+
 # ----- HTML emitters ------------------------------------------------------
 
 def render_story(s: dict) -> str:
@@ -315,7 +329,7 @@ def escape_html(s: str) -> str:
     )
 
 
-def make_html(date: str, meta: dict, stories: list[dict], coming_up: list[dict], site_url: str) -> str:
+def make_html(date: str, meta: dict, stories: list[dict], coming_up: list[dict], site_url: str, audio_html: str = "") -> str:
     title = f"Morning Letter \u2014 {date}"
     canonical = f"{site_url.rstrip('/')}/d/{date}/"
     og_image = f"{site_url.rstrip('/')}/d/{date}/og.png"
@@ -377,6 +391,8 @@ def make_html(date: str, meta: dict, stories: list[dict], coming_up: list[dict],
     {pills_html}
   </section>
 
+  {audio_html}
+
   <section class="stories" aria-label="Today's stories">
 {stories_html}
   </section>
@@ -423,11 +439,30 @@ def main() -> int:
     stories = parse_stories(cleaned)
     coming_up = parse_coming_up(cleaned)
 
+    # Audio player — only if a podcast.mp3 sits next to the markdown. The
+    # <audio> element is native HTML5 with `controls`; styling lives in
+    # static/styles.css under `.podcast-card`. The mp3 is co-located with
+    # digest.md and index.html in d/<DATE>/, so the relative URL is just
+    # "podcast.mp3". File size is read for the label.
+    audio_html = ""
+    audio_path = os.path.join(os.path.dirname(os.path.abspath(args.input_md)), "podcast.mp3")
+    if os.path.isfile(audio_path):
+        size_bytes = os.path.getsize(audio_path)
+        size_mb = size_bytes / (1024 * 1024)
+        duration_label = _estimate_audio_duration(size_bytes)
+        audio_html = (
+            f'<section class="podcast-card" aria-label="Listen to this edition">\n'
+            f'  <p class="podcast-kicker">🎙 Listen to today\'s letter</p>\n'
+            f'  <audio class="podcast-player" controls preload="metadata" src="podcast.mp3"></audio>\n'
+            f'  <p class="podcast-meta">Joe Rogan-style narration · ~{duration_label} · {size_mb:.1f} MB MP3</p>\n'
+            f'</section>\n'
+        )
+
     # Recompute n_stories from the parsed list if the meta line was missing.
     if not meta["n_stories"]:
         meta["n_stories"] = len(stories)
 
-    html = make_html(date, meta, stories, coming_up, args.site_url)
+    html = make_html(date, meta, stories, coming_up, args.site_url, audio_html=audio_html)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output_html)), exist_ok=True)
     with open(args.output_html, "w", encoding="utf-8", newline="\n") as f:

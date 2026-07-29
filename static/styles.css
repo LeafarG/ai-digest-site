@@ -141,6 +141,43 @@ code {
   max-width: 36rem;
 }
 .meta-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+
+/* ---------- podcast card (per-day) ---------- */
+.podcast-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  margin: 0 0 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.podcast-card .podcast-kicker {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    Roboto, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+.podcast-card .podcast-player {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+.podcast-card .podcast-meta {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    Roboto, sans-serif;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+@media (prefers-color-scheme: dark) {
+  .podcast-card { background: var(--bg-card); border-color: var(--border); }
+}
 .meta-pill {
   display: inline-flex;
   align-items: center;

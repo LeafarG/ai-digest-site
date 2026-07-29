@@ -94,6 +94,19 @@ function extractDeployInfo(output) {
 }
 
 (async function main() {
+  // 0) Render podcast audio (best-effort). Voxtral TTS lives on the build
+  //    host's WSL. If the server is down or the render fails, log a warning
+  //    and continue with text-only — the per-day HTML still ships and the
+  //    site degrades gracefully (no <audio> element).
+  try {
+    run("render_podcast", "node", [
+      path.join(SITE_ROOT, "scripts", "render_podcast.js"),
+      "--date", DATE,
+    ]);
+  } catch (e) {
+    console.warn("[publish_site] podcast render failed (continuing without audio): " + (e.message || e));
+  }
+
   // 1) Render HTML
   run("render_html", "python", [
     path.join(SITE_ROOT, "scripts", "render_html.py"),
