@@ -124,7 +124,7 @@ function ensureVoxtral() {
 
 const STORY_RE = /^- \*\*\[([A-Z-]+)\]\s+(.+?)\.\*\*\s*([\s\S]*?)(?=^- \*\*|^##\s+Coming|^---|\Z)/gm;
 const COMING_UP_HEAD_RE = /^##\s+Coming up/m;
-const COMING_UP_ITEM_RE = /^- \*\*([^*]+)\*\*\s*[-\-]\s*(.+)$/gm;
+const COMING_UP_ITEM_RE = /^- \*\*([^*]+)\*\*\s*[—\-]\s*(.+)$/gm;
 const SOURCE_LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 
 function parseDigest(md) {
@@ -134,9 +134,14 @@ function parseDigest(md) {
     const kicker = m[1];
     const headline = m[2].trim();
     let body = m[3].trim();
-    // Drop trailing source block ("Source: ...")
-    const sourceMatch = body.match(/\n+Source:\s*([\s\S]+?)(?:\n\n|\n*$)/);
-    if (sourceMatch) body = body.slice(0, sourceMatch.index).trim();
+    // Drop trailing source block. Sources can be inline (e.g. `... Microsoft. Source: [a](url) · [b](url)`)
+    // or on their own line. Split at the last "Source:" marker (case-insensitive).
+    const sourceRe = /\bsource:\s*/gi;
+    const srcMatches = [...body.matchAll(sourceRe)];
+    if (srcMatches.length > 0) {
+      const lastSrc = srcMatches[srcMatches.length - 1];
+      body = body.slice(0, lastSrc.index).trim();
+    }
     // Trim to first paragraph to keep audio tight.
     const firstPara = body.split(/\n\n/)[0].trim();
     stories.push({ kicker, headline, body: firstPara });
